@@ -69,7 +69,7 @@ $ heroku ps:scale web=1
 
 
 11. Rodar a função deploy() para criar as tabelas no db, os tipos de usuários e o administrador:
-$ heroku run python laucnher.py deploy
+$ heroku run python launcher.py deploy
 
 12. Reiniciar a app:
 $ heroku start
