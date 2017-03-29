@@ -1,0 +1,33 @@
+### PROCEDIMENTO - MIGRAÇÃO (ATUALIZAÇÃO) DO BANCO DE DADOS
+
+# Comentar as linhas que importam as views de administração no arquivo app/__init__.py:
+
+    from administracao import admin
+    admin.init_app(app)
+    
+    from administracao import views
+
+# Para criar o ambiente de migrações, use o comando
+
+$ python launcher.py db init
+
+# Após feita alguma modificação nas tabelas (adição ou edição)
+
+$ python launcher.py db migrate
+
+# A última linha da saída é importante:
+
+> Generating [...]/sie-ufc/migrations/versions/1769683377a8_.py ... done
+
+# Abra o arquivo de migração gerado
+
+# Na função "upgrade" apague a linha: op.drop_table('spatial_ref_sys')
+
+# Caso a atualização envolva campos de geometria, adicione a seguinte linha nas importações:
+import geoalchemy2
+
+# Salve e execute o comando de atualização:
+
+$ python launcher.py db upgrade
+
+# Caso necessário, descomentar as linhas no arquivo app/__init__.py

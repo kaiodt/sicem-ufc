@@ -1,0 +1,44 @@
+/*
+################################################################################
+## SICEM - UFC 
+################################################################################
+## Estilos Página Equipamentos - Blueprint Principal
+################################################################################
+*/
+
+.table>thead>tr>th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table>tbody>tr>td {
+  text-align: center;
+  vertical-align: middle;  
+}
+
+/* Filtros */
+
+table.filters {
+    border-collapse: collapse;
+    border-spacing: 4px;
+}
+
+table.filters:not(:empty) {
+    margin: 12px 0px 20px 0px;
+}
+
+/* Espaço entre o botão do filtro, operação e campo do valor */
+table.filters tr td {
+    padding-right: 5px;
+    padding-bottom: 3px;
+}
+
+/* Campos Select2 (operação e valor)*/
+
+.filters .filter-op {
+    width: 130px;
+}
+
+.filters .filter-val {
+    width: 220px;
+}

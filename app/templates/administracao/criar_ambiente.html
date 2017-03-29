@@ -1,0 +1,51 @@
+{% extends 'admin/model/create.html' %}
+{% import "bootstrap/wtf.html" as wtf %}
+
+
+{% block title %}
+  {{ admin_view.name }} | Administração -  SICEM-UFC
+{% endblock %}
+
+
+{% block head %}
+  {{ super() }}
+  {% include 'administracao/head.html' %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/administracao/criar_ambiente_equipamento.css') }}">
+{% endblock %}
+
+
+{% block page_body %}
+  {% include 'administracao/topo.html' %}
+
+  {% block body %}
+    <div class="container">
+      <h3 style="margin-top: 0px;">
+        {{ admin_view.name }}
+      </h3>
+
+      {% block navlinks %}
+        <ul class="nav nav-tabs">
+          <li>
+              <a href="{{ url_for('ambiente.index_view') }}">{{ _gettext('List') }}</a>
+          </li>
+          <li class="active">
+              <a href="javascript:void(0)">{{ _gettext('Create') }}</a>
+          </li>
+        </ul>
+      {% endblock %}
+      
+      <h3>Selecione o tipo de ambiente a ser criado</h3>
+      
+      <div class="col-md-4">
+        {{ wtf.quick_form(form) }}
+        <a class="btn btn-danger" href="{{ return_url }}">Cancelar</a>
+      </div>
+    </div>
+  {% endblock %}
+{% endblock %}
+
+
+{% block tail %}
+  {{ super() }}
+  {% include 'administracao/rodape.html' %}
+{% endblock %}

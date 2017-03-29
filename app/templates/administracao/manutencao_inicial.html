@@ -1,0 +1,38 @@
+{% extends 'admin/master.html' %}
+
+
+{% block title %}
+  {{ admin_view.name }} | Administração -  SICEM-UFC
+{% endblock %}
+
+
+{% block head %}
+  {{ super() }}
+  {% include 'administracao/head.html' %}
+{% endblock %}
+
+
+{% block page_body %}
+  {% include 'administracao/topo.html' %}
+
+  {% block body %}
+  <div class="container">
+    <h2>Manutenção Inicial</h3>
+
+    <h4>Escolha uma das opções</h3>
+
+    <a class="btn btn-default" role="button" href="{{ url_for('manutencao.create_view', id=id, tipo='inicial', url=url_for('equipamento.index_view')) }}">
+      Cadastrar Manutenção Inicial
+    </a>
+    <a class="btn btn-default" role="button" href="{{ url_for('manutencao.manutencao_inicial_padrao', id=id) }}">
+      Utilizar Padrão
+    </a>
+  </div>
+  {% endblock %}
+{% endblock %}
+
+
+{% block tail %}
+  {{ super() }}
+  {% include 'administracao/rodape.html' %} 
+{% endblock %}

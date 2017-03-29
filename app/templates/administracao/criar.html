@@ -1,0 +1,34 @@
+{% extends 'admin/model/create.html' %}
+
+
+{% block title %}
+  {{ admin_view.name }} | Administração -  SICEM-UFC
+{% endblock %}
+
+
+{% block head %}
+  {{ super() }}
+  {% include 'administracao/head.html' %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/administracao/criar.css') }}">
+{% endblock %}
+
+
+{% block page_body %}
+  {% include 'administracao/topo.html' %}
+
+  {% block body %}
+    <div class="container">
+      <h3 style="margin-top: 0px;">
+        {{ admin_view.name }}
+      </h3>
+      {{ super() }} 
+    </div>
+  {% endblock %}
+{% endblock %}
+
+
+{% block tail %}
+  {{ super() }}
+  {% include 'administracao/rodape.html' %}
+  <script type="text/javascript" src="{{ url_for('static', filename='js/administracao/criar.js') }}"></script>
+{% endblock %}

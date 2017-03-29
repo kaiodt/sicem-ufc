@@ -1,0 +1,11 @@
+Olá {{ usuario.nome }},
+
+Para confirmar seu novo email, clique no link abaixo:
+
+{{ url_for('autenticacao.alterar_email', token=token, _external=True) }}
+
+Sinceramente,
+
+Equipe SICEM-UFC.
+
+Atenção: Não responda este email!

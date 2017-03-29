@@ -1,0 +1,17 @@
+Prezado administrador,
+
+O usuário {{ novo_usuario.nome }} [{{ novo_usuario.email }}] solicitou cadastro no SICEM-UFC.
+
+Para verificar este usuário, clique no link abaixo:
+
+{{ url_for('autenticacao.verificacao', id=novo_usuario.id, _external=True) }}
+
+Caso não reconheça este usuário, para cancelar a solicitação, clique no link abaixo:
+
+{{ url_for('autenticacao.verificacao_negada', id=novo_usuario.id, _external=True) }}
+
+Sinceramente,
+
+Equipe SICEM-UFC.
+
+Atenção: Não responda este email!

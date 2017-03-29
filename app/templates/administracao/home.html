@@ -1,0 +1,29 @@
+{% extends 'admin/master.html' %}
+
+
+{% block title %}Home | Administração -  SICEM-UFC{% endblock %}
+
+
+{% block head %}
+  {{ super() }}
+  {% include 'administracao/head.html' %}
+{% endblock %}
+
+
+{% block page_body %}
+  {% include 'administracao/topo.html' %}
+
+  {% block body %}
+  <div class="container">
+    <h1>Painel de Administração</h1>
+
+    <h3>Utilize a barra de navegação acima para manipular o banco de dados.</h3>    
+  </div>
+  {% endblock %}
+{% endblock %}
+
+
+{% block tail %}
+  {{ super() }}
+  {% include 'administracao/rodape.html' %} 
+{% endblock %}

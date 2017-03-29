@@ -1,0 +1,110 @@
+<!-- Cabeçalho -->
+
+<div class="container">
+  <div class="masthead">
+    <div class="row">
+      <div class="app-header">
+        <div class="app-title col-sm-8 col-xs-12">
+          <a href="{{ url_for('principal.home') }}">
+            <img src="{{url_for('static', filename='images/UFC_logo.png') }}" alt="UFC-Logo">
+          </a>
+          <span class="text-muted">Sistema de Controle de Equipamentos e Manutenções</span>
+        </div>
+        <div class="user-header col-sm-4 col-xs-12">
+          {% if current_user.is_authenticated %}
+            <div class="btn-group">
+              <button id="minha-conta-btn" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                <i class="fa fa-user-circle" aria-hidden="true"></i> Minha Conta <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="#">
+                    <i class="fa fa-user" aria-hidden="true"></i> {{ current_user.nome }}
+                  </a>
+                </li>
+                <li role="separator" class="divider"></li>
+                {% if current_user.cadastrador() %}
+                  <li>
+                    <a href="{{ url_for('admin.index') }}">
+                      <i class="fa fa-cogs" aria-hidden="true"></i> Administração
+                    </a>                      
+                  </li>
+                {% endif %}
+                <li>
+                  <a href="{{ url_for('autenticacao.alterar_senha') }}">
+                    <i class="fa fa-lock" aria-hidden="true"></i> Alterar Senha
+                  </a>
+                </li>
+                <li>
+                  <a href="{{ url_for('autenticacao.pedido_alteracao_email') }}">
+                    <i class="fa fa-at" aria-hidden="true"></i> Alterar Email
+                  </a>
+                </li>
+                <li role="separator" class="divider"></li>
+                <li>
+                  <a href="{{ url_for('autenticacao.logout') }}">
+                    <i class="fa fa-user-times" aria-hidden="true"></i> Logout
+                  </a>
+                </li>
+              </ul>
+            </div>
+          {% else %}
+            <a href="{{ url_for('autenticacao.cadastro_usuario') }}">
+              <i class="fa fa-user-plus" aria-hidden="true"></i> Cadastro
+            </a>
+            <a href="{{ url_for('autenticacao.login') }}">
+              <i class="fa fa-user" aria-hidden="true"></i> Login
+            </a>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>    
+</div>
+
+<!-- Barra de Navegação -->
+
+<div class="container">
+  <nav class="navbar navbar-default" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-navbar-collapse">
+        <span class="sr-only">Toggle navigation</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      
+      {% block brand %}
+        <a class="navbar-brand" href="{{ url_for('principal.home') }}">{{ admin_view.admin.name }}</a>
+      {% endblock %}
+    </div>
+
+    <!-- navbar content -->
+    <div class="collapse navbar-collapse" id="admin-navbar-collapse">
+      {% block main_menu %}
+        <ul class="nav navbar-nav">
+          {{ layout.menu() }}
+        </ul>
+      {% endblock %}
+
+      {% block menu_links %}
+        <ul class="nav navbar-nav navbar-right">
+          {{ layout.menu_links() }}
+        </ul>
+      {% endblock %}
+
+      {% block access_control %}
+      {% endblock %}
+    </div>
+  </nav>
+
+
+  {% block messages %}
+    {{ layout.messages() }}
+  {% endblock %}
+
+
+  {# store the jinja2 context for form_rules rendering logic #}
+  {% set render_ctx = h.resolve_ctx() %}
+</div>

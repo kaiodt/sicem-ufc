@@ -1,0 +1,24 @@
+/*
+################################################################################
+## SICEM - UFC 
+################################################################################
+## Estilos Views de Detalhes - Painel de Administração
+################################################################################
+*/
+
+
+/* Esconder controles de edição do mapa */
+/* Manter apenas controle de zoom */
+div.leaflet-draw.leaflet-control {
+  display: none;
+}
+
+/* Listagem dos campos tipos relação */
+span.label {
+  margin-right: 5px;
+  font-size: 80%;
+}
+
+a.campo_relacao {
+  text-decoration: none;
+}

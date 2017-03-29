@@ -1,0 +1,5 @@
+Mensagem de {{ nome }} [{{ email }}]:
+
+{{ mensagem }}
+
+Atenção: Não responda este email!

@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% import "macros.html" as macros with context%}
+
+
+{% block page_title %}Manutenções Abertas{% endblock %}
+
+
+{% set active_tab = 'manutencao' %}
+
+
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/manutencao.css') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/select2/select2.css', v='3.5.2') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/select2/select2-bootstrap3.css', v='1.4.6') }}">
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/daterangepicker/daterangepicker-bs3.css', v='1.3.22') }}">
+{% endblock %}
+
+
+{% block page_content %}
+  <div class="page-header">
+    <h1>Controle de Manutenções</h1>  
+  </div>
+
+  <ul class="nav nav-tabs">
+    <li role="presentation" class="active">
+      <a href="{{ url_for('principal.manutencoes_abertas') }}">
+        Manutenções Abertas
+      </a>
+    </li>
+
+    <li role="presentation">
+      <a href="{{ url_for('principal.manutencoes_agendadas') }}">
+        Manutenções Agendadas
+      </a>
+    </li>
+
+    <!-- Filtros -->
+    {% if filtros %}
+      <li class="dropdown">
+        {{ macros.filter_options() }}
+      </li>
+    {% endif %}
+
+    <button id="botao-legenda" type="button" class="btn btn-default" data-toggle="modal" data-target="#modalLegenda">
+      Legenda
+    </button>
+  </ul>
+
+
+  {% if filtros %}
+    {{ macros.filter_form() }}
+    <div class="clearfix"></div>
+  {% endif %}
+  
+
+  <table class="table table-hover">
+    <thead>
+      <tr>
+        <th>Tombamento</th>
+        <th>Tipo de Equipamento</th>
+        <th>Ambiente</th>
+        <th>Bloco</th>
+        <th>Departamento</th>
+        <th>Centro</th>
+        <th>Campus</th>
+        <th>Data de Abertura</th>
+        {% if current_user.cadastrador() %}
+          <th></th> 
+        {% endif %}
+      </tr>
+    </thead>
+
+    {% if equip_man_aberta %}
+      <tbody>
+        {% for equipamento in equip_man_aberta %}
+          {% if (data_hoje - equipamento.manutencoes[-1].data_abertura).days > 30 %}
+            <tr class="danger">
+          {% elif (data_hoje - equipamento.manutencoes[-1].data_abertura).days > 7 %}
+            <tr class="warning">
+          {% else %}
+            <tr>
+          {% endif %}
+              <td>{{ equipamento.tombamento }}</td>
+              <td>{{ equipamento.tipo_equipamento }}</td>
+              <td>{{ equipamento.ambiente.nome }}</td>
+              <td>{{ equipamento.ambiente.bloco.nome }}</td>
+              <td>{{ equipamento.ambiente.bloco.departamento.nome }}</td>
+              <td>{{ equipamento.ambiente.bloco.departamento.centro.nome }}</td>
+              <td>{{ equipamento.ambiente.bloco.departamento.centro.campus.nome }}</td>
+              <td>{{ equipamento.manutencoes[-1].data_abertura.strftime('%d.%m.%Y') }}</td>
+            {% if current_user.cadastrador() %}
+              <td>
+                <div class="dropdown">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="equip{{ equipamento.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                    <i class="fa fa-wrench" aria-hidden="true"></i>
+                  </button>
+                  
+                  <ul class="dropdown-menu opcoes_manutencao" aria-labelledby="equip{{ equipamento.id }}">
+                    <li>
+                      <a href="{{ url_for('manutencao.edit_view',
+                                          id=equipamento.manutencoes[-1].id,
+                                          url=url_for('principal.manutencoes_abertas')) }}">
+                        Concluir Manutenção
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </td>
+            {% endif %}
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    </table>
+    <h4>Nenhum equipamento com manutenção aberta.</h4>
+  {% endif %}
+
+
+  <!-- Paginação -->
+  {% if pagination %}
+    <div class="pagination">
+      {{ macros.pagination_widget(pagination, 'principal.manutencoes_abertas') }}
+    </div>    
+  {% endif %}
+
+
+  <!-- Modal de Legenda -->
+  <div class="modal fade" id="modalLegenda" tabindex="-1" role="dialog" aria-labelledby="labelModalLegenda">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+          <h4 class="modal-title" id="labelModalLegenda">Legenda de Cores</h4>
+        </div>
+        <div class="modal-body">
+          <table class="table">
+            <tbody>
+              <tr class="warning">
+                <td>Aberta há mais de 7 dias</td>
+              </tr>
+              <tr class="danger">
+                <td>Aberta há mais de 30 dias</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" data-dismiss="modal">Fechar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+
+{% block scripts %}
+  {{ super() }}
+  <script type="text/javascript" src="{{ url_for('static', filename='externo/select2/select2.min.js', v='3.5.2') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='externo/moment.min.js', v='2.9.0') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='externo/daterangepicker/daterangepicker.js', v='1.3.22') }}"></script>
+
+  <script type="text/javascript" src="{{ url_for('static', filename='js/principal/form.js') }}"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename='js/principal/filters.js') }}"></script>
+
+  <script language="javascript">
+      (function($) {
+          $('[data-role=tooltip]').tooltip({
+              html: true,
+              placement: 'bottom'
+          });
+          {% if filter_groups %}
+              var filter = new AdminFilters(
+                  '#filter_form', '.field-filters',
+                  {{ filter_groups|tojson|safe }},
+                  {{ active_filters|tojson|safe }}
+              );
+          {% endif %}
+      })(jQuery);
+  </script>
+{% endblock %}

@@ -1,0 +1,46 @@
+### INSTALAÇÃO POSTGRESQL, POSTGIS, PGADMIN3
+
+# Adicionar repositórios
+
+$ sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ `lsb_release -cs`-pgdg main" >> /etc/apt/sources.list.d/pgdg.list'
+
+# Transferir chaves
+
+$ wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | sudo apt-key add -
+
+# Instalar PostgreSQL 9.6
+
+$ sudo apt-get update
+$ sudo apt-get install postgresql postgresql-contrib
+
+# Instalar Pgadmin3
+
+$ sudo apt-get install pgadmin3
+
+# Instalar PostGIS 2.3
+
+$ sudo apt-get install postgresql-9.6-postgis-2.3
+
+# Configuração
+
+$ sudo -u postgres createuser --superuser $USER
+$ psql postgres
+
+postgres# ALTER USER postgres PASSWORD 'postgres'
+postgres# CREATE DATABASE dev_sie_ufc;
+postgres# CREATE ROLE sie_ufc_admin LOGIN PASSWORD 'sie_ufc';
+postgres# GRANT ALL PRIVILEGES ON DATABASE dev_sie_ufc TO sie_ufc_admin;
+postgres# \q
+
+$ psql dev_sie_ufc
+
+dev_sie_ufc# CREATE EXTENSION postgis;
+dev_sie_ufc# \q
+
+# Configuração Pgadmin3
+
+$ pgadmin3
+
+* Add connection to a server
+Name
+Host: 127.0.0.1

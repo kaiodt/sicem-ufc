@@ -1,0 +1,128 @@
+/*
+################################################################################
+## SICEM - UFC 
+################################################################################
+## Estilos Base - Painel de Administração
+################################################################################
+*/
+
+
+body {
+  padding-top: 20px;
+  font-family: 'Lora', serif;
+  color: #555;
+}
+
+.footer {
+  padding-top: 40px;
+  padding-bottom: 10px;
+  margin-top: 10px;
+  border-top: 1px solid #eee;
+}
+
+.app-header {
+  display: flex;
+  align-items: center;
+  flex-flow: row wrap;
+  margin-bottom: 10px;
+}
+
+.app-title {
+  display: inline-flex;
+  align-items: center;
+}
+
+.app-title img {
+  height: 50px;
+  padding-right: 10px;
+  margin-right: 10px;
+  border-right: 2px solid #777;
+}
+
+.app-title span {
+  font-size: 22px;
+}
+
+.user-header {
+  text-align: right;
+  font-size: 17px;
+}
+
+.user-header a {
+  color: #777;
+  padding-left: 15px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+.user-header a:hover,
+.user-header a:focus {
+  text-decoration: none;
+  color: #333;
+}
+
+.user-header .dropdown-menu {
+  left: unset;
+  right: 0;
+  font-size: 15px;
+}
+
+.user-header .dropdown-menu a {
+  color: #777;
+}
+
+.user-header .dropdown-menu i {
+  width: 18px;
+}
+
+#minha-conta-btn {
+  border: 0;
+  color: #777;
+  font-size: 17px;
+  background-image: none;
+  box-shadow: none;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+#minha-conta-btn:hover,
+#minha-conta-btn:focus,
+#minha-conta-btn:active {
+  color: #333;
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+button.navbar-toggle {
+  margin-left: 10px;
+}
+
+#admin-navbar-collapse ul li {
+  margin-left: 10px;
+}
+
+@media (max-width: 550px) {
+  .app-header span {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 380px) {
+  .app-header span {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 350px) {
+  .app-header span {
+    font-size: 10px;
+  }
+}
+
+.footer a {
+  float: right;
+  text-decoration: none;
+}

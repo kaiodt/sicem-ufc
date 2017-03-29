@@ -1,0 +1,78 @@
+{# Macro para adicionar widget de paginação #}
+
+{% macro pagination_widget(pagination, endpoint, fragment='') %}
+  <ul class="pagination">
+    <li {% if not pagination.has_prev %} class="disabled" {% endif %}>
+      <a href="{% if pagination.has_prev %}
+          {{ url_for(endpoint, page=pagination.prev_num, **kwargs) }}{{ fragment }}
+        {% else %}
+          #
+        {% endif %}">
+          &laquo;
+      </a>
+    </li>
+
+    {% for p in pagination.iter_pages() %}
+      {% if p %}
+        {% if p == pagination.page %}
+          <li class="active">
+            <a href="{{ url_for(endpoint, page=p, **kwargs) }}{{ fragment }}">{{ p }}</a>
+          </li>
+        {% else %}
+          <li>
+            <a href="{{ url_for(endpoint, page=p, **kwargs) }}{{ fragment }}">{{ p }}</a>
+          </li>
+        {% endif %}
+      {% else %}
+        <li class="disabled">
+          <a href="#">&hellip;</a>
+        </li>
+      {% endif %}
+    {% endfor %}
+    
+    <li {% if not pagination.has_next %} class="disabled" {% endif %}>
+      <a href="{% if pagination.has_next %}
+          {{ url_for(endpoint, page=pagination.next_num, **kwargs) }}{{ fragment }}
+        {% else %}
+          #
+        {% endif %}">
+          &raquo;
+      </a>
+    </li>
+  </ul>
+{% endmacro %}
+
+{# Macro para  geração da opção de adição de filtros e os possíveis campos que podem 
+   ser filtrados (adaptado do flask-admin) #}
+
+{% macro filter_options(btn_class='dropdown-toggle') %}
+    <a class="{{ btn_class }}" data-toggle="dropdown" href="javascript:void(0)">
+      Adicionar Filtro <b class="caret"></b>
+    </a>
+    <ul class="dropdown-menu field-filters">
+        {% for k in filter_groups %}
+        <li>
+            <a href="javascript:void(0)" class="filter" onclick="return false;">{{ k }}</a>
+        </li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+
+
+{# Macro para geração do formulário onde são definidos os filtros a serem utilizados 
+   e seus valores #}
+
+{% macro filter_form() %}
+    <form id="filter_form" method="GET" action="{{ url_inicial }}">
+        <div class="pull-right">
+            <button type="submit" class="btn btn-primary" style="display: none">Aplicar</button>
+            {% if active_filters %}
+              <a href="{{ url_inicial }}" class="btn btn-default">Limpar Filtros</a>
+            {% endif %}
+        </div>
+
+        <table class="filters"></table>
+    </form>
+    <div class="clearfix"></div>
+{% endmacro %}
+

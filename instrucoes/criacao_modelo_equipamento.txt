@@ -1,0 +1,13 @@
+# Adição de Tipo de Equipamento
+
+1. Criação do Modelo (app/models.py), baseando-se em um já existente
+    - Adicionar campos
+    - Ajustar método __init__ com tipo e categoria
+
+2. Atualização do banco de dados
+    - python launcher.py db migrate
+    - deletar linha no arquivo de versão gerado pelo migrate: op.drop_table('spatial_ref_sys')
+    - python launcher.py db upgrade
+
+3. Formulários de criação e edição do equipamento, baseando-se em um já existente
+

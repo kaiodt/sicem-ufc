@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+
+
+{% block page_title %}Home{% endblock %}
+
+
+{% block head %}
+  {{ super() }}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/home.css') }}">
+{% endblock %}
+
+
+{% set active_tab = 'home' %}
+
+
+{% block page_content %}
+  <div class="jumbotron">
+    <h1>Bem vindo ao Sistema de Controle de Equipamentos e Manutenções da UFC</h1>
+    <p class="lead">
+      Uma iniciativa da Coordenadoria de Conservação de Energia da Superintendência de Infraestrutura da Universidade Federal do Ceará
+    </p>
+  </div>
+{% endblock %}

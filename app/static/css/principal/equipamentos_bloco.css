@@ -1,0 +1,17 @@
+/*
+################################################################################
+## SICEM - UFC 
+################################################################################
+## Estilos Página Equipamentos de um Bloco- Blueprint Principal
+################################################################################
+*/
+
+.table>thead>tr>th {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.table>tbody>tr>td {
+  text-align: center;
+  vertical-align: middle;  
+}

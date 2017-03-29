@@ -1,0 +1,13 @@
+Olá {{ usuario.nome }},
+
+Seu cadastro não foi autorizado pelos administradores do Sistema de Controle de Equipamentos e Manutenções da UFC.
+
+Caso deseje entrar em contato com os administradores, clique no link abaixo:
+
+{{ url_for('principal.contato', _external=True) }}
+
+Sinceramente,
+
+Equipe SICEM-UFC.
+
+Atenção: Não responda este email!

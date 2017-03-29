@@ -1,0 +1,94 @@
+UPLOAD O APP NO HEROKU:
+(com repositório git em funcionamento e heroku CLI instalado)
+(23/03/2017)
+
+1. Criar app no heroku
+$ heroku create <nome_do_app>
+
+
+2. Instalar buildpack para geolocalização (necessário devido aos mapas e biblioteca shapely) e posteriormente o de python:
+$ heroku buildpacks:add https://github.com/cyberdelia/heroku-geo-buildpack.git --index 1
+$ heroku buildpacks:add heroku/python --index 2
+
+
+3. Rode 'heroku buildpacks' para ter certesa que heroku-geo-buildpack foi adicionado antes do buildpack de python:
+$ heroku buildpacks
+===
+1. https://github.com/cyberdelia/heroku-geo-buildpack.git
+2. heroku/python
+
+
+4. Adicionar o postgress database (também pode ser adicionado no site):
+$ heroku addons:add heroku-postgresql
+Na data deste tutorial o URL do database é salvo na variável local DATABASE_URL e o db é automaticamente promovido mas, por segurança, rodar:
+$ heroku pg:promote DATABASE_URL
+
+
+5. Instalar postgis para o db aceitar dados de geolocalização:
+Abrir a comunicação com o db:
+$ heroku pg:psql
+Inserir comando:
+=> CREATE EXTENSION postgis;
+
+
+6. Definir variáveis locais no heroku: (também podem ser definidas no site através do dashboard)
+$ heroku config:set <NOME_VARIAVEL_LOCAL>=<valor_variável_local>
+Lista de variáveis do app:
+DATABASE_URL    : url do db de produção
+SECRET_KEY      : chave secreta utilizada em vários locais do app
+ADMIN_EMAIL     : email da administração
+MAIL_USERNAME   : email que o app irá utilizar para mandar emails
+MAIL_PASSWORD   : senha do email que o app irá utilizar para mandar emails
+MAIL_SENDER     : string contendo o nome que aparecerá no email. Ex: 'SIE-UFC <sie.ufc@gmail.com>'
+FLASK_CONFIG    : o modo em que o app será utilizado (checar dicionário em config.py) (para o heroku deve ser atribuido FLASK_CONFIG=heroku)
+
+Para checar as variáveis locais no heroku:
+$ heroku config
+
+
+7. Conferir se o arquivo 'Procfile' existe e está correto:
+Atualmente basta a linha abaixo:
+web: gunicorn launcher:app
+
+
+8. Conferir se no arquivo 'requirements.txt' a linha contendo:
+Flask-Admin
+Foi substituída por:
+./flask-admin-mod/
+Visando a instalação da versão modificada da extensão. (solução apresentada pelo primeiros desenvolvedores da plataforma)
+
+
+9. Fazer upload do app:
+$ git push heroku master
+
+
+10. Garanta que pelo menos uma instância do app está rodando:
+$ heroku ps:scale web=1
+
+
+11. Rodar a função deploy() para criar as tabelas no db, os tipos de usuários e o administrador:
+$ heroku run python laucnher.py deploy
+
+12. Reiniciar a app:
+$ heroku start
+
+13. Por fim, se quiser abrir a aplicação pela linha de comando:
+$ heroku open
+
+
+=========================================================================
+
+
+MANUTENÇÃO DO APP:
+(23/03/2017)
+
+Depois que o 'commit' de todas as atualizações for feito no repositório git:
+$ heroku maintenance:on
+$ git push heroku master
+$ heroku run python launcher.py deploy
+$ heroku restart
+$ heroku maintenance:off
+
+A opção de manutenção do heroku vai deixar o app offline e irá fornecer uma página web para o usuário informando que o site irá retornar em breve.
+
+OBS: Alguns comandos como '$ heroku pg:psql', '$ heroku run python launcher.py deploy' podem não funcionar se a conexão com a internet for de baixa qualidade.

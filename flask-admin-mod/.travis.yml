@@ -1,0 +1,50 @@
+sudo: false
+language: python
+matrix:
+  include:
+    - python: 2.6
+      env: TOX_ENV=py26-WTForms1
+    - python: 2.6
+      env: TOX_ENV=py26-WTForms2
+    - python: 2.7
+      env: TOX_ENV=py27-WTForms1
+    - python: 2.7
+      env: TOX_ENV=py27-WTForms2
+    - python: 2.7
+      env: TOX_ENV=flake8
+    - python: 3.3
+      env: TOX_ENV=py33-WTForms1
+    - python: 3.3
+      env: TOX_ENV=py33-WTForms2
+    - python: 3.4
+      env: TOX_ENV=py34-WTForms1
+    - python: 3.4
+      env: TOX_ENV=py34-WTForms2
+    - python: 3.5
+      env: TOX_ENV=py35-WTForms1
+    - python: 3.5
+      env: TOX_ENV=py35-WTForms2
+    - python: 3.6
+      env: TOX_ENV=py36-WTForms1
+    - python: 3.6
+      env: TOX_ENV=py36-WTForms2
+
+addons:
+  postgresql: "9.4"
+
+services:
+  - postgresql
+  - mongodb
+
+before_script:
+  - psql -U postgres -c 'CREATE DATABASE flask_admin_test;'
+  - psql -U postgres -c 'CREATE EXTENSION postgis;' flask_admin_test
+  - psql -U postgres -c 'CREATE EXTENSION hstore;' flask_admin_test
+
+install:
+  - pip install tox
+
+script: tox -e $TOX_ENV
+
+after_success:
+    - coveralls
