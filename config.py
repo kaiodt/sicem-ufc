@@ -20,28 +20,26 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 # Configuração Geral
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or \
-        'w\xc4\x1d\xfc\xaf\xab.\x03a\x02!\x87#p\nH\xcb\xd4\x86yV\x90Z\x89'  # !!!!!!!
+    SECRET_KEY = os.environ.get('SECRET_KEY')
 
     SSL_DISABLE = True
 
-    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL') or 'kaiodtr@gmail.com'      # !!!!!!!
-    ADMIN_SENHA = os.environ.get('ADMIN_SENHA') or '123456'                 # !!!!!!!
+    ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
+    ADMIN_SENHA = os.environ.get('ADMIN_SENHA')
 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
-    MAIL_USERNAME = os.environ.get('MAIL_USERNAME') or 'sicem.ufc@gmail.com'  # !!!!!!!
-    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD') or 'SisInfoEquipMan'      # !!!!!!!
-    MAIL_SENDER = os.environ.get('MAIL_SENDER') or 'SICEM-UFC <sicem.ufc@gmail.com>'
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+    MAIL_SENDER = os.environ.get('MAIL_SENDER')
 
     MAPBOX_MAP_ID = 'mapbox.streets'
-    MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN') or \
-        'pk.eyJ1IjoibHVjYXNzbSIsImEiOiJjaW05cDlmMXYwMDFidzhtM3JzN291dzZqIn0.WC0WGjp2FzN0VNOZ3JHjnQ'
+    MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN')
 
-        
+    
 # Configuração de Desenvolvimento
 class ConfigDesenvolvimento(Config):
     DEBUG = True
