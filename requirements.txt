@@ -9,7 +9,7 @@ dominate==2.3.1
 enum34==1.1.6
 Flask==0.12
 #Flask-Admin==1.4.2
--e ./flask-admin-mod/
+./flask-admin-mod/
 Flask-BabelEx==0.9.3
 Flask-Bootstrap==3.3.7.1
 Flask-Login==0.4.0

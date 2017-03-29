@@ -43,7 +43,7 @@ class ConfigDesenvolvimento(Config):
     DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-      'postgresql://sie_ufc_admin:sie_ufc@localhost/dev_sie_ufc'
+      'postgresql://sie_ufc_admin:sie_ufc@localhost/dev_sicem_ufc'
 
 # Configuração de Teste
 class ConfigTeste(Config):
@@ -63,7 +63,7 @@ class ConfigProducao(Config):
         import logging
         from logging.handlers import SMTPHandler
         from app.models import Usuario
-        
+
         credentials = None
         secure = None
 
