@@ -93,3 +93,4 @@ ENV/
 
 # Outros
 configuracao_heroku.txt
+set_config
