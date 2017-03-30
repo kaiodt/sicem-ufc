@@ -546,20 +546,24 @@ class Manutencao(db.Model):
     def __repr__(self):
         if self.data_conclusao:
             data = self.data_conclusao
+            str_status = 'concluída'
         else:
             data = self.data_abertura
+            str_status = 'aberta'
 
-        return '<Manutenção: %d [%s %d] em %s>' % (self.num_ordem_servico, 
+        return '<Manutenção: %d [%s %d] %s em %s>' % (self.num_ordem_servico, 
             self.equipamento.tipo_equipamento, self.equipamento.tombamento,
-            data.strftime("%d.%m.%Y"))
+            str_status, data.strftime("%d.%m.%Y"))
 
     def __str__(self):
         if self.data_conclusao:
             data = self.data_conclusao
+            str_status = 'concluída'
         else:
             data = self.data_abertura
+            str_status = 'aberta'
 
-        return '%d [%s %d] em %s' % (self.num_ordem_servico, 
+        return '%d [%s %d] %s em %s' % (self.num_ordem_servico, 
             self.equipamento.tipo_equipamento, self.equipamento.tombamento,
-            data.strftime("%d.%m.%Y"))
+            str_status, data.strftime("%d.%m.%Y"))
 

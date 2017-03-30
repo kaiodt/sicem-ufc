@@ -43,7 +43,7 @@ class ConfigDesenvolvimento(Config):
     DEBUG = True
 
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
-      'postgresql://sie_ufc_admin:sie_ufc@localhost/dev_sicem_ufc'
+      'postgresql://sicem_ufc_admin:sicem_ufc@localhost/dev_sicem_ufc'
 
 # Configuração de Teste
 class ConfigTeste(Config):
@@ -89,7 +89,7 @@ class ConfigProducao(Config):
 
 
 # Configuração do Heroku (perceba que ela herda da configuração de produção)
-class HerokuConfig(ConfigProducao):
+class ConfigHeroku(ConfigProducao):
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
     @classmethod
@@ -117,7 +117,7 @@ modos_configuracao = {
     'desenvolvimento': ConfigDesenvolvimento,
     'teste': ConfigTeste,
     'producao': ConfigProducao,
-    'heroku': HerokuConfig,
+    'heroku': ConfigHeroku,
 
     'padrao': ConfigDesenvolvimento
 }

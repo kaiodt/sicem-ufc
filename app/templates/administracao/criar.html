@@ -28,7 +28,8 @@
 
 
 {% block tail %}
-  {{ super() }}
   {% include 'administracao/rodape.html' %}
+  {% include 'administracao/form_scripts.html' %}
+
   <script type="text/javascript" src="{{ url_for('static', filename='js/administracao/criar.js') }}"></script>
 {% endblock %}

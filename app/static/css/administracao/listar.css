@@ -19,3 +19,7 @@
 .table>tbody>tr>td>div {
   margin: auto;
 }
+
+.model-list {
+  margin-top: 0px;
+}

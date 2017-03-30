@@ -31,6 +31,6 @@
 
 {% block tail %}
   {{ super() }}
-  {{ lib.form_js() }}
   {% include 'administracao/rodape.html' %}
+  {% include 'administracao/form_scripts.html' %}
 {% endblock %}

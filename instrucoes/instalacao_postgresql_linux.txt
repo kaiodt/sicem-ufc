@@ -27,12 +27,12 @@ $ sudo -u postgres createuser --superuser $USER
 $ psql postgres
 
 postgres# ALTER USER postgres PASSWORD 'postgres'
-postgres# CREATE DATABASE dev_sie_ufc;
-postgres# CREATE ROLE sie_ufc_admin LOGIN PASSWORD 'sie_ufc';
-postgres# GRANT ALL PRIVILEGES ON DATABASE dev_sie_ufc TO sie_ufc_admin;
+postgres# CREATE DATABASE dev_sicem_ufc;
+postgres# CREATE ROLE sicem_ufc_admin LOGIN PASSWORD 'sicem_ufc';
+postgres# GRANT ALL PRIVILEGES ON DATABASE dev_sicem_ufc TO sicem_ufc_admin;
 postgres# \q
 
-$ psql dev_sie_ufc
+$ psql dev_sicem_ufc
 
 dev_sie_ufc# CREATE EXTENSION postgis;
 dev_sie_ufc# \q

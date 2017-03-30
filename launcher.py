@@ -67,7 +67,7 @@ def deploy():
     # Cria os cargos dos usuários
     Cargo.criar_cargos()
     
-    # Criar administrador
+    # Criar administrador, caso não haja um ainda
     Usuario.criar_administrador()
 
 

@@ -6,7 +6,7 @@
       <a href="{% if pagination.has_prev %}
           {{ url_for(endpoint, page=pagination.prev_num, **kwargs) }}{{ fragment }}
         {% else %}
-          #
+          javascript:void(0)
         {% endif %}">
           &laquo;
       </a>
@@ -25,7 +25,7 @@
         {% endif %}
       {% else %}
         <li class="disabled">
-          <a href="#">&hellip;</a>
+          <a href="javascript:void(0)">&hellip;</a>
         </li>
       {% endif %}
     {% endfor %}
@@ -34,7 +34,7 @@
       <a href="{% if pagination.has_next %}
           {{ url_for(endpoint, page=pagination.next_num, **kwargs) }}{{ fragment }}
         {% else %}
-          #
+          javascript:void(0)
         {% endif %}">
           &raquo;
       </a>

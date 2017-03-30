@@ -100,10 +100,6 @@ button.navbar-toggle {
   margin-left: 10px;
 }
 
-#admin-navbar-collapse ul li {
-  margin-left: 10px;
-}
-
 @media (max-width: 550px) {
   .app-header span {
     font-size: 15px;
