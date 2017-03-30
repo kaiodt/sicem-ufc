@@ -9,7 +9,7 @@
 from datetime import date
 from flask import render_template, redirect, url_for, request, current_app
 from flask_login import login_required
-from shapely import wkb     # para converter na view function 'equipamentos'
+from shapely import wkb
 
 from . import principal
 from .filters import *
@@ -37,7 +37,8 @@ def mapa():
     centros = Centro.query.all()
     campi = Campus.query.all()
     
-    # Listas que conterão dicionários com o par objeto e localização (convertida para números de lat. e long. que podem ser processados pela extensão Leaflet)
+    # Listas que conterão dicionários com o par objeto e localização (convertida para números de lat. e long. 
+    # que podem ser processados pela extensão Leaflet)
     lista_blocos = []
     lista_subestacoes_abrigadas = []
     lista_subestacoes_aereas = []    
@@ -46,7 +47,8 @@ def mapa():
 
     # Processos iterativos que geram essas listas de dicionários
     for bloco in blocos:
-        if bloco.localizacao is not None:    # se o bloco tiver uma localização registrada ele será adicionado à lista que será levada ao mapa
+        if bloco.localizacao is not None:    # se o bloco tiver uma localização registrada ele será adicionado 
+                                             # à lista de exibição do mapa
             point_temp = wkb.loads(bytes(bloco.localizacao.data))
             localizacao_temp = [point_temp.y, point_temp.x]
             lista_blocos.append({"objeto_bloco": bloco,
@@ -69,13 +71,14 @@ def mapa():
                                              "localizacao":                localizacao_temp
                 })
 
+    # Como Centros e Campus possuem um mapeamento de multi-polígonos o processo iterativo é mais complexo
     for centro in centros:
         if centro.mapeamento is not None:
             map_temp = wkb.loads(bytes(centro.mapeamento.data)) # convertendo de um WKBElement para formato da biblioteca shapely
             mapeamento = []
             for area in list(map_temp):    # list(map_temp) retorna uma lista com os vários polygonos (ou áreas) do centro
-                                           # formato: lista de tuples contendo dois elementos cada (latitude e longitude) 
-                                           # Ex: [(1, 0),(1, 1),(0, 1)]
+                                           # formato de um polígono: lista de tuples contendo dois elementos cada (latitude 
+                                           # e longitude). Ex: Um triângulo é [(0, 0),(0, 1),(1, 0)]
                 # trocar (x,y) => (y,x)
                 coordenadas_temp = []
                 for ponto in list(area.exterior.coords):
@@ -114,13 +117,16 @@ def mapa():
 def equipamentos_bloco():
     id_bloco = request.args.get('id')
     bloco = Bloco.query.get(id_bloco)
+   
     ambientes = bloco.ambientes
     local_equipamentos = []
 
+    #Adicionando os equipamentos de cada ambiente à lista local_equipamentos
     for ambiente in ambientes:
         local_equipamentos.extend(ambiente.equipamentos)
 
-    dict_local_equipamentos = {}    # dicionário com a key como o tipo do equipamento e seu valor a lista de equipamentos
+    dict_local_equipamentos = {}    # dicionário cujas keys são os tipos do equipamentos e os valores 
+                                    # são as listas de equipamentos de cada tipo
 
     for equipamento in local_equipamentos:
         if equipamento.em_uso:  # considerando apenas equipamentos em uso

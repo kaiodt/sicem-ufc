@@ -1,6 +1,6 @@
 UPLOAD O APP NO HEROKU:
 (com repositório git em funcionamento e heroku CLI instalado)
-(23/03/2017)
+(30/03/2017)
 
 1. Criar app no heroku
 $ heroku create <nome_do_app>
@@ -53,28 +53,23 @@ Atualmente basta a linha abaixo:
 web: gunicorn launcher:app
 
 
-8. Conferir se no arquivo 'requirements.txt' a linha contendo:
-Flask-Admin
-Foi substituída por:
-./flask-admin-mod/
-Visando a instalação da versão modificada da extensão. (solução apresentada pelo primeiros desenvolvedores da plataforma)
-
-
-9. Fazer upload do app:
+8. Fazer upload do app:
 $ git push heroku master
 
 
-10. Garanta que pelo menos uma instância do app está rodando:
+9. Garanta que pelo menos uma instância do app está rodando:
 $ heroku ps:scale web=1
 
 
-11. Rodar a função deploy() para criar as tabelas no db, os tipos de usuários e o administrador:
+10. Rodar a função deploy() para criar as tabelas no db, os tipos de usuários e o administrador:
 $ heroku run python launcher.py deploy
 
-12. Reiniciar a app:
-$ heroku start
 
-13. Por fim, se quiser abrir a aplicação pela linha de comando:
+11. Reiniciar a app:
+$ heroku restart
+
+
+12. Por fim, se quiser abrir a aplicação pela linha de comando:
 $ heroku open
 
 
@@ -93,4 +88,4 @@ $ heroku maintenance:off
 
 A opção de manutenção do heroku vai deixar o app offline e irá fornecer uma página web para o usuário informando que o site irá retornar em breve.
 
-OBS: Alguns comandos como '$ heroku pg:psql', '$ heroku run python launcher.py deploy' podem não funcionar se a conexão com a internet for de baixa qualidade.
+OBS: Alguns comandos como '$ heroku pg:psql', '$ heroku run python launcher.py deploy' podem não funcionar na internet do bloco do IPDI da UFC (não sei dizer se por baixa qualidade da conexão, firewall ou outra coisa).
