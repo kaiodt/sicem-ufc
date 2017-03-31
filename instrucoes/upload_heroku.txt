@@ -53,23 +53,29 @@ Atualmente basta a linha abaixo:
 web: gunicorn launcher:app
 
 
-8. Fazer upload do app:
+8. Mais a frente, após enviar o código para o Heroku, iremos mandar que o app rode a função deploy (que cria as tabelas, tipos de usuários e o usuário administrador no db). Mas, para obter sucesso ao rodar a função temos que fornecer um script de migração à aplicação. Para tal criamos, localmente, um db vazio e com ele um geramos um script de migration. Basta rodar localmente:
+$ python launcher.py db init
+$ python launcher.py db migrate
+Depois, dentro da pasta migrations/versions procurar o último script feito e deletar a linha contendo: op.drop_table('spatial_ref_sys')
+
+
+9. Fazer upload do app:
 $ git push heroku master
 
 
-9. Garanta que pelo menos uma instância do app está rodando:
+10. Garanta que pelo menos uma instância do app está rodando:
 $ heroku ps:scale web=1
 
 
-10. Rodar a função deploy() para criar as tabelas no db, os tipos de usuários e o administrador:
+11. Rodar a função deploy() para criar as tabelas no db, os tipos de usuários e o administrador:
 $ heroku run python launcher.py deploy
 
 
-11. Reiniciar a app:
+12. Reiniciar a app:
 $ heroku restart
 
 
-12. Por fim, se quiser abrir a aplicação pela linha de comando:
+13. Por fim, se quiser abrir a aplicação pela linha de comando:
 $ heroku open
 
 
