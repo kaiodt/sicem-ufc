@@ -4,6 +4,7 @@
     - Adicionar campos
     - Ajustar método __init__ com tipo e categoria
 
+
 2. Atualização do banco de dados
     Local:
     - Rodar o comando: $ python launcher.py db migrate
