@@ -207,10 +207,10 @@ def reenviar_confirmacao():
     if current_user.confirmado:
         return redirect(url_for('principal.home'))
 
-        token = usuario.gerar_token_confirmacao()
-        enviar_email(current_user.email, 'Confirme Seu Cadastro',
-                     'autenticacao/email/confirmacao', usuario=current_user, token=token)
-        flash('Um novo email de confirmação foi enviado. Confira a sua caixa de entrada.', 'info')
+    token = current_user.gerar_token_confirmacao()
+    enviar_email(current_user.email, 'Confirme Seu Cadastro',
+                 'autenticacao/email/confirmacao', usuario=current_user, token=token)
+    flash('Um novo email de confirmação foi enviado. Confira a sua caixa de entrada.', 'info')
 
     return redirect(url_for('principal.home'))
 
