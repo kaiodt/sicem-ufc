@@ -17,8 +17,9 @@ from flask_login import current_user
 class HomeView(AdminIndexView):
     # Restringir acesso apenas para administradores e cadastradores
     def is_accessible(self):
-        return current_user.cadastrador()
+        return current_user.pode_cadastrar()
 
+    # Modificando página inicial padrão do Flask-Admin
     @expose('/')
     def home(self):
         return self.render('administracao/home.html')

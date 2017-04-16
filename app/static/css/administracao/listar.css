@@ -2,24 +2,28 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Views de Listagem - Painel de Administração
+## Estilos - Views de Listagem - Painel de Administração
 ################################################################################
 */
 
+/* Centralizar células do cabeçalho da tabela */
 .table>thead>tr>th {
   text-align: center;
   vertical-align: middle;
 }
 
+/* Centralizar células do corpo da tabela */
 .table>tbody>tr>td {
   text-align: center;
   vertical-align: middle;
 }
 
+/* Centralizar células que contêm dados do tipo mapa */
 .table>tbody>tr>td>div {
   margin: auto;
 }
 
+/* Corrigir borda superior da tabela */
 .model-list {
   margin-top: 0px;
 }

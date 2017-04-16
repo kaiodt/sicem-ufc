@@ -2,15 +2,18 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Página Equipamentos de um Bloco- Blueprint Principal
+## Estilos - Página Equipamentos de um Bloco- Blueprint Principal
 ################################################################################
 */
 
+
+/* Centralizar células do cabeçalho da tabela */
 .table>thead>tr>th {
   text-align: center;
   vertical-align: middle;
 }
 
+/* Centralizar células do corpo da tabela */
 .table>tbody>tr>td {
   text-align: center;
   vertical-align: middle;  

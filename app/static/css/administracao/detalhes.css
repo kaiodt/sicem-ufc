@@ -2,7 +2,7 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Views de Detalhes - Painel de Administração
+## Estilos - Views de Detalhes - Painel de Administração
 ################################################################################
 */
 
@@ -19,6 +19,7 @@ span.label {
   font-size: 80%;
 }
 
+/* Retirar sublinhado dos links */
 a.campo_relacao {
   text-decoration: none;
 }

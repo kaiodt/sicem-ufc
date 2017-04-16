@@ -18,6 +18,7 @@ import app.models as model
 
 ########## Configuração de Codificação UTF-8 ##########
 
+# Necessário para que os caracteres especiais do português sejam reconhecidos
 
 reload(sys)
 sys.setdefaultencoding('utf-8')
@@ -27,6 +28,7 @@ sys.setdefaultencoding('utf-8')
 
 
 # A configuração é definida pela variável de ambiente FLASK_CONFIG
+# Caso uma configuração específica não seja escolhida, a padrão é utilizada
 
 app = criar_app(os.getenv('FLASK_CONFIG') or 'padrao')
 
@@ -42,6 +44,8 @@ migrate = Migrate(app, db)
 
 
 # Shell de python com acesso à aplicação e ao banco de dados
+# OBS: Os modelos do banco de dados são acessados da seguinte maneira:
+# model.[Modelo], por exemplo, model.Usuario
 
 def make_shell_context():
     return dict(app=app, db=db, model=model)
@@ -62,12 +66,14 @@ def deploy():
     from app.models import Cargo, Usuario
 
     # Migrar banco de dados para última versão
+    # A pasta "migrations" precisa existir e deve ter pelo menos uma
+    # versão de migração de banco de dados
     upgrade()
 
-    # Cria os cargos dos usuários
+    # Cria os cargos dos usuários, se ainda não foram criados
     Cargo.criar_cargos()
     
-    # Criar administrador, caso não haja um ainda
+    # Criar administrador padrão, caso ainda não haja um
     Usuario.criar_administrador()
 
 

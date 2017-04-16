@@ -15,7 +15,8 @@ from wtforms.validators import InputRequired, Email, Length, Regexp
 ########## Formulários ##########
 
 
-# Formulário Base (Com traduções)
+# Formulário Base (Tradução habilitada)
+
 class FormBase(FlaskForm):
     class Meta:
         locales = ['pt_BR']

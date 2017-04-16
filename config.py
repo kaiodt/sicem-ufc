@@ -9,24 +9,30 @@
 
 import os
 
-# Diretório base
-basedir = os.path.abspath(os.path.dirname(__file__))
-
 
 ########## Classes de Configuração ##########
 
 
-# Configuração Geral
+# Cada classe traz configurações para um tipo específico de uso da aplicação
+
+# Configuração Geral (Comum a todas as configurações)
 class Config:
+    # Configurações sensíveis devem ser definidas como variáveis de ambiente!
+
+    # Usada nos processos de autenticação do Flask
     SECRET_KEY = os.environ.get('SECRET_KEY')
 
+    # Desabilitar encriptação por padrão
     SSL_DISABLE = True
 
+    # Dados do primeiro administrador
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
     ADMIN_SENHA = os.environ.get('ADMIN_SENHA')
 
+    # Gerar commits do banco de dados 
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
+    # Configuração do envio de emails do sistema
     MAIL_SERVER = 'smtp.googlemail.com'
     MAIL_PORT = 587
     MAIL_USE_TLS = True
@@ -34,16 +40,24 @@ class Config:
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_SENDER = os.environ.get('MAIL_SENDER')
 
+    # Configuração do Mapbox
     MAPBOX_MAP_ID = 'mapbox.streets'
     MAPBOX_ACCESS_TOKEN = os.environ.get('MAPBOX_ACCESS_TOKEN')
 
-    
+    # Método executado quando a aplicação é criada (cls é a própria classe)
+    @classmethod
+    def init_app(cls, app):
+        pass
+
+
 # Configuração de Desenvolvimento
 class ConfigDesenvolvimento(Config):
     DEBUG = True
 
+    # Banco de dados (local)
     SQLALCHEMY_DATABASE_URI = os.environ.get('DEV_DATABASE_URL') or \
       'postgresql://sicem_ufc_admin:sicem_ufc@localhost/dev_sicem_ufc'
+
 
 # Configuração de Teste
 class ConfigTeste(Config):
@@ -52,13 +66,16 @@ class ConfigTeste(Config):
 
 # Configuração de Produção
 class ConfigProducao(Config):
+    # Banco de dados
     SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
+    # Método executado quando a aplicação é criada (cls é a própria classe)
     @classmethod
     def init_app(cls, app):
+        # Executar método inicial da configuração padrão
         Config.init_app(app)
 
-        # Enviar email de erros para administradores
+        # Configuração do envio de emails com logs de erros para os administradores
 
         import logging
         from logging.handlers import SMTPHandler
@@ -67,13 +84,19 @@ class ConfigProducao(Config):
         credentials = None
         secure = None
 
+        # Obter dados da conta de envio de emails do sistema
+
         if getattr(cls, 'MAIL_USERNAME', None) is not None:
             credentials = (cls.MAIL_USERNAME, cls.MAIL_PASSWORD)
             if getattr(cls, 'MAIL_USE_TLS', None):
                 secure = ()
 
+        # Gerar lista de emails dos administradores
+
         lista_adms = Usuario.listar_administradores()
         emails_administradores = [usuario.email for usuario in lista_adms]
+
+        # Criação do objeto que enviará os emails
 
         mail_handler = SMTPHandler(
             mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
@@ -83,22 +106,26 @@ class ConfigProducao(Config):
             credentials=credentials,
             secure=secure)
 
+        # Definindo nível de log (apenas erros graves)
         mail_handler.setLevel(logging.ERROR)
+
+        # Registrando o objeto na aplicação
         app.logger.addHandler(mail_handler)
 
 
-
-# Configuração do Heroku (perceba que ela herda da configuração de produção)
+# Configuração do Heroku (herda da Configuração de Produção)
 class ConfigHeroku(ConfigProducao):
+    # Habilitar encriptação
     SSL_DISABLE = bool(os.environ.get('SSL_DISABLE'))
 
+    # Método executado quando a aplicação é criada (cls é a própria classe)
     @classmethod
     def init_app(cls, app):
+        # Executar método inicial da configuração de produção
         ConfigProducao.init_app(app)
 
         # Resolve headers do proxy do servidor
         from werkzeug.contrib.fixers import ProxyFix
-
         app.wsgi_app = ProxyFix(app.wsgi_app)
 
         # Log em stderr
@@ -112,6 +139,7 @@ class ConfigHeroku(ConfigProducao):
 
 ########## Dicionário para Seleção de Configuração ##########
 
+# A configuração é selecionada na criação da aplicação
 
 modos_configuracao = {
     'desenvolvimento': ConfigDesenvolvimento,

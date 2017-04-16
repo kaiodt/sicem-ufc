@@ -2,11 +2,12 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Views de Criação - Painel de Administração
+## Estilos - Views de Criação - Painel de Administração
 ################################################################################
 */
 
 
+/* Corrigir tamanho dos campos tipo 'checkbox' */
 input[type='checkbox'] {
   box-shadow: none;
   width: 18px;

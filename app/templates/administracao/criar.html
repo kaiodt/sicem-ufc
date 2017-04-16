@@ -1,5 +1,12 @@
+{# Template para as Views de Criação do Painel de Administração #}
+
+
+{# Estende o template original do Flask-Admin #}
+
 {% extends 'admin/model/create.html' %}
 
+
+{# Título da Página #}
 
 {% block title %}
   {{ admin_view.name }} | Administração -  SICEM-UFC
@@ -8,10 +15,15 @@
 
 {% block head %}
   {{ super() }}
+
+  {# Incluir CSS comum do painel de administração #}
   {% include 'administracao/head.html' %}
+
+  {# CSS adicional #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/administracao/criar.css') }}">
 {% endblock %}
 
+{# Conteúdo da Página #}
 
 {% block page_body %}
   {% include 'administracao/topo.html' %}
@@ -21,6 +33,8 @@
       <h3 style="margin-top: 0px;">
         {{ admin_view.name }}
       </h3>
+
+      {# Parte original da view de criação Flask-Admin #}
       {{ super() }} 
     </div>
   {% endblock %}
@@ -28,6 +42,7 @@
 
 
 {% block tail %}
+  
   {% include 'administracao/rodape.html' %}
   {% include 'administracao/form_scripts.html' %}
 

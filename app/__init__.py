@@ -44,8 +44,14 @@ login_manager.login_message_category = 'warning'
 # Cria uma instância da aplicação em determinado modo de configuração
 
 def criar_app(configuracao):
+    # Criar applicação Flask
     app = Flask(__name__)
+
+    # Definir as configurações da aplicação (dicionário no arquivo config.py)
     app.config.from_object(modos_configuracao[configuracao])
+
+    # Executar o método de inicialização da configuração escolhida
+    modos_configuracao[configuracao].init_app(app)
 
     # Passando a instância da aplicação para as extensões
 

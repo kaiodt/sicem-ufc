@@ -2,13 +2,12 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Página Inicial - Blueprint Principal
+## Estilos - Página Inicial - Blueprint Principal
 ################################################################################
 */
 
 
 /* Jumbotron */
-
 .jumbotron {
   text-align: center;
   background-color: transparent;
@@ -16,10 +15,12 @@
 
 }
 
+/* Texto principal do jumbotron */
 .jumbotron h1 {
   margin-top: 0px;
 }
 
+/* Retirar padding do jumbotron para telas menores que 480px */
 @media (max-width: 480px) {
   .container .jumbotron {
     padding-left: 0px;

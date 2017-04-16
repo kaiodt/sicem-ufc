@@ -24,7 +24,7 @@
 
   <ul class="nav nav-tabs">
     <li role="presentation" class="active">
-      <a href="{{ url_for('principal.manutencoes_abertas') }}">
+      <a href="javascript:void(0)">
         Manutenções Abertas
       </a>
     </li>
@@ -57,49 +57,53 @@
   <table class="table table-hover">
     <thead>
       <tr>
-        <th>Tombamento</th>
+        <th>Ordem de Serviço</th>
+        <th>Tipo de Manutenção</th>
         <th>Tipo de Equipamento</th>
+        <th>Tombamento</th>
         <th>Ambiente</th>
         <th>Bloco</th>
         <th>Departamento</th>
         <th>Centro</th>
         <th>Campus</th>
         <th>Data de Abertura</th>
-        {% if current_user.cadastrador() %}
+        {% if current_user.pode_cadastrar() %}
           <th></th> 
         {% endif %}
       </tr>
     </thead>
 
-    {% if equip_man_aberta %}
+    {% if man_abertas %}
       <tbody>
-        {% for equipamento in equip_man_aberta %}
-          {% if (data_hoje - equipamento.manutencoes[-1].data_abertura).days > 30 %}
+        {% for manutencao in man_abertas %}
+          {% if (data_hoje - manutencao.data_abertura).days > 30 %}
             <tr class="danger">
-          {% elif (data_hoje - equipamento.manutencoes[-1].data_abertura).days > 7 %}
+          {% elif (data_hoje - manutencao.data_abertura).days > 7 %}
             <tr class="warning">
           {% else %}
             <tr>
           {% endif %}
-              <td>{{ equipamento.tombamento }}</td>
-              <td>{{ equipamento.tipo_equipamento }}</td>
-              <td>{{ equipamento.ambiente.nome }}</td>
-              <td>{{ equipamento.ambiente.bloco.nome }}</td>
-              <td>{{ equipamento.ambiente.bloco.departamento.nome }}</td>
-              <td>{{ equipamento.ambiente.bloco.departamento.centro.nome }}</td>
-              <td>{{ equipamento.ambiente.bloco.departamento.centro.campus.nome }}</td>
-              <td>{{ equipamento.manutencoes[-1].data_abertura.strftime('%d.%m.%Y') }}</td>
-            {% if current_user.cadastrador() %}
+              <td>{{ manutencao.num_ordem_servico }}</td>
+              <td>{{ manutencao.tipo_manutencao }}</td>
+              <td>{{ manutencao.equipamento.tipo_equipamento }}</td>
+              <td>{{ manutencao.equipamento.tombamento }}</td>
+              <td>{{ manutencao.equipamento.ambiente.nome }}</td>
+              <td>{{ manutencao.equipamento.ambiente.bloco.nome }}</td>
+              <td>{{ manutencao.equipamento.ambiente.bloco.departamento.nome }}</td>
+              <td>{{ manutencao.equipamento.ambiente.bloco.departamento.centro.nome }}</td>
+              <td>{{ manutencao.equipamento.ambiente.bloco.departamento.centro.campus.nome }}</td>
+              <td>{{ manutencao.data_abertura.strftime('%d.%m.%Y') }}</td>
+            {% if current_user.pode_cadastrar() %}
               <td>
                 <div class="dropdown">
-                  <button class="btn btn-default dropdown-toggle" type="button" id="equip{{ equipamento.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                  <button class="btn btn-default dropdown-toggle" type="button" id="manutencao{{ manutencao.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
                     <i class="fa fa-wrench" aria-hidden="true"></i>
                   </button>
                   
-                  <ul class="dropdown-menu opcoes_manutencao" aria-labelledby="equip{{ equipamento.id }}">
+                  <ul class="dropdown-menu opcoes_manutencao" aria-labelledby="manutencao{{ manutencao.id }}">
                     <li>
                       <a href="{{ url_for('manutencao.edit_view',
-                                          id=equipamento.manutencoes[-1].id,
+                                          id=manutencao.id,
                                           url=url_for('principal.manutencoes_abertas')) }}">
                         Concluir Manutenção
                       </a>

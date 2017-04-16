@@ -16,13 +16,15 @@ from wtforms.validators import InputRequired, Email, Length, Regexp, EqualTo
 from ..models import Usuario, Cargo
 
 
-########## Formulários ##########
+########## Formulário Base (Tradução habilitada) ##########
 
 
-# Formulário Base (Com traduções)
 class FormBase(FlaskForm):
     class Meta:
         locales = ['pt_BR']
+
+
+########## Formulários do Sistema de Autenticação ##########
 
 
 # Login
@@ -51,31 +53,36 @@ class FormCadastroUsuario(FormBase):
 
     senha = PasswordField('Senha', validators=[InputRequired(),
                                                Length(6, 16),
-                                               EqualTo('senha2')])
+                                               EqualTo('senha2', 'Senhas diferentes.')])
 
     senha2 = PasswordField('Confirme Senha', validators=[InputRequired()])
 
     submit = SubmitField('Cadastrar')
 
 
+    # Cerificar que o email já não foi cadastrado
     def validate_email(self, field):
         if Usuario.query.filter_by(email=field.data).first():
             raise ValidationError('Email já cadastrado.')
 
 
-# Verificação de Usuário
+# Verificação de Usuário (Para administradores aceitarem novos usuários)
 class FormVerificarUsuario(FormBase):
     nome = StringField('Nome', render_kw={'disabled': 'disabled'})
 
     email = StringField('Email', render_kw={'disabled': 'disabled'})
 
+    # Escolha do cargo do novo usuário
     cargo = SelectField('Cargo')
 
     submit = SubmitField('Verificar')
 
+
+    # Inicialização
     def __init__(self, *args, **kwargs):
         super(FormVerificarUsuario, self).__init__(*args, **kwargs)
 
+        # Gerar as opções de cargo via busca no banco de dados
         self.cargo.choices = \
             [(cargo.nome, cargo.nome) for  cargo in Cargo.query.all()]
 
@@ -102,6 +109,7 @@ class FormPedidoRecuperarSenha(FormBase):
     submit = SubmitField('Recuperar Senha')
 
 
+    # Certificar que o email existe no banco de dados
     def validate_email(self, field):
         if Usuario.query.filter_by(email=field.data).first() is None:
             raise ValidationError('Email não cadastrado.')
@@ -122,6 +130,7 @@ class FormRecuperarSenha(FormBase):
     submit = SubmitField('Atualizar Senha')
 
 
+    # Certificar que o email existe no banco de dados
     def validate_email(self, field):
         if Usuario.query.filter_by(email=field.data).first() is None:
             raise ValidationError('Email não cadastrado.')
@@ -138,6 +147,7 @@ class FormAlterarEmail(FormBase):
     submit = SubmitField('Atualizar Email')
 
 
+    # Certificar que o novo email desejado já não existe no banco de dados
     def validate_email(self, field):
         if Usuario.query.filter_by(email=field.data).first():
             raise ValidationError('Email já cadastrado.')

@@ -2,11 +2,12 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Criação de Ambiente e Equipamento - Painel de Administração
+## Estilos - Criação de Ambiente e Equipamento - Painel de Administração
 ################################################################################
 */
 
 
+/* Alinhar botões horizontalmente */
 form {
   display: inline;
 }

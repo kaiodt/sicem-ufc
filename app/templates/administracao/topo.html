@@ -1,4 +1,4 @@
-<!-- Cabeçalho -->
+{# Cabeçalho #}
 
 <div class="container">
   <div class="masthead">
@@ -23,7 +23,7 @@
                   </a>
                 </li>
                 <li role="separator" class="divider"></li>
-                {% if current_user.cadastrador() %}
+                {% if current_user.pode_cadastrar() %}
                   <li>
                     <a href="{{ url_for('admin.index') }}">
                       <i class="fa fa-cogs" aria-hidden="true"></i> Administração
@@ -62,11 +62,10 @@
   </div>    
 </div>
 
-<!-- Barra de Navegação -->
+{# Barra de Navegação #}
 
 <div class="container">
   <nav class="navbar navbar-default" role="navigation">
-    <!-- Brand and toggle get grouped for better mobile display -->
     <div class="navbar-header">
       <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#admin-navbar-collapse">
         <span class="sr-only">Toggle navigation</span>
@@ -80,7 +79,6 @@
       {% endblock %}
     </div>
 
-    <!-- navbar content -->
     <div class="collapse navbar-collapse" id="admin-navbar-collapse">
       {% block main_menu %}
         <ul class="nav navbar-nav">

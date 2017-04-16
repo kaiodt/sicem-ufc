@@ -15,13 +15,14 @@ from flask import Blueprint
 
 principal = Blueprint('principal', __name__)
 
-# Importação de views
+# Importação das views
 
 from . import views, errors
 
 
-########## Disponibilação de Permissões nos Templates ##########
+########## Disponibilização de Permissões nos Templates ##########
 
+# Torna a classe "Permissao" (em "models.py") global para todos os templates
 
 from ..models import Permissao
 
@@ -29,4 +30,3 @@ from ..models import Permissao
 def injetar_permissoes():
     return dict(Permissao=Permissao)
 
-    

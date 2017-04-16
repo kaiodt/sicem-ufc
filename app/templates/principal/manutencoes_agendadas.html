@@ -30,7 +30,7 @@
     </li>
 
     <li role="presentation" class="active">
-      <a href="{{ url_for('principal.manutencoes_agendadas') }}">
+      <a href="javascript:void(0)">
         Manutenções Agendadas
       </a>
     </li>
@@ -65,7 +65,7 @@
         <th>Centro</th>
         <th>Campus</th>
         <th>Próxima Manutenção</th>
-        {% if current_user.cadastrador() %}
+        {% if current_user.pode_cadastrar() %}
           <th></th> 
         {% endif %}
       </tr>
@@ -91,7 +91,7 @@
               <td>{{ equipamento.ambiente.bloco.departamento.centro.nome }}</td>
               <td>{{ equipamento.ambiente.bloco.departamento.centro.campus.nome }}</td>
               <td>{{ equipamento.proxima_manutencao.strftime('%d.%m.%Y') }}</td>
-            {% if current_user.cadastrador() %}
+            {% if current_user.pode_cadastrar() %}
               <td>
                 <div class="dropdown">
                   <button class="btn btn-default dropdown-toggle" type="button" id="equip{{ equipamento.id }}" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">

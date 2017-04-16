@@ -15,7 +15,7 @@ from flask import Blueprint
 
 autenticacao = Blueprint('autenticacao', __name__)
 
-# Importação de views
+# Importação das views
 
 from . import views
 

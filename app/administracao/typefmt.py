@@ -16,29 +16,32 @@ from geoalchemy2.shape import to_shape
 from geoalchemy2.elements import WKBElement
 from sqlalchemy import func
 
-from ..util import tools
-
 
 ########## Formatos de Tipos de Dados ##########
 
+# Alteração da forma como alguns tipos de dados são exibidos nas views
+# de listagem e de detalhes
 
 # Tipo Data
 def formato_data(view, value):
+    # Exibição no formato dd.mm.aaa
     return value.strftime('%d.%m.%Y')
 
 
 # Tipo Mapa
 def formato_mapa(view, value):
-    # Alterar dimensões do mapa na view de detalhes
+    # Mostrar mapa maior na view de detalhes
     if 'details' in request.path:
         width = 400
         height = 400
         zoom = 17
+    # Mostrar mapa menor na view de listagem
     else:
         width = 100
         height = 70
         zoom = 15
 
+    # Passando parâmetros para renderização do widget do mapa
     params = html_params(**{
         "data-role": "leaflet",
         "data-width": width,
@@ -47,7 +50,8 @@ def formato_mapa(view, value):
         "data-zoom": zoom
     })
 
-    # Desabilitar edição na view de listar
+    # Desabilitar edição do mapa na view de listagem
+    # Deixar zoom habilitado na view de detalhes
     if 'details' not in request.path:
         params += u' disabled'
 
@@ -61,20 +65,24 @@ def formato_mapa(view, value):
 
 ########## Formatos de Campos Específicos ##########
 
+# Alteração da forma como alguns campos específicos dos modelos são 
+# exibidos nas views de listagem e de detalhes
 
-# Campos Tipo Relação
+# Campos Tipo Relação Geral (Relações one-to-many)
 def formato_relacao(view, context, model, name):
     html_string = ""
 
-    # Extrair o tipo de relação a partir do nome do campo (plural) para
-    # usar nas urls dos links (singular)
+    # Extrair o tipo de relação a partir do nome do campo (que estará no plural)
+    # para usar nas urls dos links de redirecionamento (que deve ser no singular)
+
     if name[-1] == 's':             # Caso '***s' -> '***'
         tipo = name[:-1]
     elif name[-1] == 'i':           # Caso 'Campi' -> 'Campus'
         tipo = name[:-1] + 'us'
 
-    # Gerar lista de botões com links para cada item da relação
-    for item in model.__getattribute__(name).all():
+    # Gerar lista de botões com links de redirecionamento para cada item da relação
+
+    for item in model.__getattribute__(name).order_by('nome').all():
         html_string += \
             '<a class="campo_relacao" href="{url}">\
                 <span class="label label-default">{nome}</span>\
@@ -84,48 +92,50 @@ def formato_relacao(view, context, model, name):
     return Markup(html_string)
 
 
-# Campos Tipo Ambientes
+# Campos Tipo Relação de Ambientes
 def formato_relacao_ambientes(view, context, model, name):
     html_string = ""
 
-    # Gerar lista de botões com links para cada ambiente
-    for ambiente in model.__getattribute__(name).all():
-        tipo = ambiente.tipo.lower().replace(' ', '')
-        tipo = tools.retirar_acentos(tipo, 'minusculo')
+    # Gerar lista de botões com links de redirecionamento para cada ambiente
+
+    for ambiente in model.__getattribute__(name).order_by('nome').all():
+        # Obter o endpoint do tipo do ambiente para gerar o link de redirecionamento
+        endpoint = ambiente.endpoint
 
         html_string += \
             '<a class="campo_relacao" href="{url}">\
                 <span class="label label-default">{nome}</span>\
-             </a>'.format(url=url_for(tipo + '.details_view', id=ambiente.id),
+             </a>'.format(url=url_for(endpoint + '.details_view', id=ambiente.id),
                           nome=ambiente.nome)
 
     return Markup(html_string)
 
 
-# Campos Tipo Equipamentos
+# Campos Tipo Relação de Equipamentos
 def formato_relacao_equipamentos(view, context, model, name):
     html_string = ""
 
-    # Gerar lista de botões com links para cada equipamento
-    for equip in model.__getattribute__(name).all():
-        tipo = equip.tipo_equipamento.lower().replace(' ', '').replace('de', '')
-        tipo = tools.retirar_acentos(tipo, 'minusculo')
+    # Gerar lista de botões com links de redirecionamento para cada equipamento
+    
+    for equip in model.__getattribute__(name).order_by('tipo_equipamento').all():
+        # Obter o endpoint do tipo do equipamento para gerar o link de redirecionamento
+        endpoint = equip.endpoint
 
         html_string += \
             '<a class="campo_relacao" href="{url}">\
                 <span class="label label-default">{tipo} [{tomb}]</span>\
-             </a>'.format(url=url_for(tipo + '.details_view', id=equip.id),
+             </a>'.format(url=url_for(endpoint + '.details_view', id=equip.id),
                           tipo=equip.tipo_equipamento, tomb=equip.tombamento)
 
     return Markup(html_string)
 
 
-# Campos Tipo Manutenções
+# Campos Tipo Relação de Manutenções
 def formato_relacao_manutencoes(view, context, model, name):
     html_string = ""
 
-    # Gerar lista de botões com links para cada manutenção
-    for manutencao in model.__getattribute__(name).all():
+    # Gerar lista de botões com links de redirecionamento para cada manutenção
+    for manutencao in model.__getattribute__(name).order_by('data_abertura').all():
         # Mostrar a data de conclusão (caso haja) ou a de abertura
         if manutencao.data_conclusao:
             data = manutencao.data_conclusao
@@ -144,6 +154,8 @@ def formato_relacao_manutencoes(view, context, model, name):
 
 ########## Registro dos Formatos de Tipos de Dados ##########
 
+# Alteração do dicionário que define os formatos dos tipos de dados padrão
+# para que sejam substituídos pelos formatos modificados
 
 FORMATOS_PADRAO = dict(typefmt.DEFAULT_FORMATTERS)
 FORMATOS_PADRAO[date] = formato_data

@@ -2,17 +2,19 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Base - Painel de Administração
+## Estilos - Base - Painel de Administração
 ################################################################################
 */
 
 
+/* Configurações gerais */
 body {
   padding-top: 20px;
   font-family: 'Lora', serif;
   color: #555;
 }
 
+/* Rodapé */
 .footer {
   padding-top: 40px;
   padding-bottom: 10px;
@@ -20,6 +22,13 @@ body {
   border-top: 1px solid #eee;
 }
 
+/* Botão "Reportar problema" no rodapé */
+.footer a {
+  float: right;
+  text-decoration: none;
+}
+
+/* Cabeçalho */
 .app-header {
   display: flex;
   align-items: center;
@@ -27,11 +36,13 @@ body {
   margin-bottom: 10px;
 }
 
+/* Título da aplicação - esquerda do cabeçalho */
 .app-title {
   display: inline-flex;
   align-items: center;
 }
 
+/* Logo da UFC */
 .app-title img {
   height: 50px;
   padding-right: 10px;
@@ -39,43 +50,33 @@ body {
   border-right: 2px solid #777;
 }
 
+/* Tamanho padrão do título */
 .app-title span {
   font-size: 22px;
 }
 
-.user-header {
-  text-align: right;
-  font-size: 17px;
+/* Tamanho do título para telas com largura entre 380px e 550px */
+@media (max-width: 550px) {
+  .app-header span {
+    font-size: 15px;
+  }
 }
 
-.user-header a {
-  color: #777;
-  padding-left: 15px;
-  transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
+/* Tamanho do título para telas com largura entre 350px e 380px */
+@media (max-width: 380px) {
+  .app-header span {
+    font-size: 12px;
+  }
 }
 
-.user-header a:hover,
-.user-header a:focus {
-  text-decoration: none;
-  color: #333;
+/* Tamanho do título para telas com largura até 350px */
+@media (max-width: 350px) {
+  .app-header span {
+    font-size: 10px;
+  }
 }
 
-.user-header .dropdown-menu {
-  left: unset;
-  right: 0;
-  font-size: 15px;
-}
-
-.user-header .dropdown-menu a {
-  color: #777;
-}
-
-.user-header .dropdown-menu i {
-  width: 18px;
-}
-
+/* Botão "Minha Conta" - direita do cabeçalho */
 #minha-conta-btn {
   border: 0;
   color: #777;
@@ -87,6 +88,7 @@ body {
   -moz-transition: all 0.5s;
 }
 
+/* Mudar cor e sombreamento do botão "Minha Conta" ao passar com o mouse ou clicar */
 #minha-conta-btn:hover,
 #minha-conta-btn:focus,
 #minha-conta-btn:active {
@@ -96,29 +98,46 @@ body {
   box-shadow: none;
 }
 
+/* Menu do usuário - ativado pelo botão "Minha Conta" */
+.user-header {
+  text-align: right;
+  font-size: 17px;
+}
+
+/* Links do menu do usuário */
+.user-header a {
+  color: #777;
+  padding-left: 15px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+/* Mudar cor dos links do menu do usuário ao passar o mouse */
+.user-header a:hover,
+.user-header a:focus {
+  text-decoration: none;
+  color: #333;
+}
+
+/* Alinhar menu do usuário à direita */
+.user-header .dropdown-menu {
+  left: unset;
+  right: 0;
+  font-size: 15px;
+}
+
+/* Links do menu do usuário */
+.user-header .dropdown-menu a {
+  color: #777;
+}
+
+/* Ícones do menu do usuário */
+.user-header .dropdown-menu i {
+  width: 18px;
+}
+
+/* Botões da barra de navegação */
 button.navbar-toggle {
   margin-left: 10px;
-}
-
-@media (max-width: 550px) {
-  .app-header span {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 380px) {
-  .app-header span {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 350px) {
-  .app-header span {
-    font-size: 10px;
-  }
-}
-
-.footer a {
-  float: right;
-  text-decoration: none;
 }

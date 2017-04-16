@@ -28,5 +28,5 @@ class DateFieldMod(DateField):
                 self.data = None
 
                 if date_str != u'':
-                    raise ValueError(self.gettext('Not a valid date value'))
+                    raise ValueError('Data inválida')
 

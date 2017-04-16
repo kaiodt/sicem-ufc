@@ -21,10 +21,10 @@
 
     <h4>Escolha uma das opções</h3>
 
-    <a class="btn btn-default" role="button" href="{{ url_for('manutencao.create_view', id=id, tipo='inicial', url=url_for('equipamento.index_view')) }}">
+    <a class="btn btn-default" role="button" href="{{ url_for('manutencao.create_view',  id=id, tipo='inicial', url=url) }}">
       Cadastrar Manutenção Inicial
     </a>
-    <a class="btn btn-default" role="button" href="{{ url_for('manutencao.manutencao_inicial_padrao', id=id) }}">
+    <a class="btn btn-default" role="button" href="{{ url }}">
       Utilizar Padrão
     </a>
   </div>

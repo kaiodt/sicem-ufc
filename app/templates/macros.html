@@ -1,4 +1,6 @@
-{# Macro para adicionar widget de paginação #}
+{# Macros #}
+
+{# Adicionar widget de paginação #}
 
 {% macro pagination_widget(pagination, endpoint, fragment='') %}
   <ul class="pagination">
@@ -42,7 +44,7 @@
   </ul>
 {% endmacro %}
 
-{# Macro para  geração da opção de adição de filtros e os possíveis campos que podem 
+{# Geração da opção de adição de filtros e os possíveis campos que podem 
    ser filtrados (adaptado do flask-admin) #}
 
 {% macro filter_options(btn_class='dropdown-toggle') %}
@@ -59,7 +61,7 @@
 {% endmacro %}
 
 
-{# Macro para geração do formulário onde são definidos os filtros a serem utilizados 
+{# Geração do formulário onde são definidos os filtros a serem utilizados 
    e seus valores #}
 
 {% macro filter_form() %}
@@ -75,4 +77,3 @@
     </form>
     <div class="clearfix"></div>
 {% endmacro %}
-

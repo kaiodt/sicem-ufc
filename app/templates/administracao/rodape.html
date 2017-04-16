@@ -1,13 +1,16 @@
+{# Rodapé #}
 <div class="container">
   <footer class="footer">
     {% block footer %}
       <p>
         © 2017 Universidade Federal do Ceará
+
+        {# Botão "Reportar problema" #}
         <a href="{{ url_for('principal.contato', tipo='problema') }}">
           <i class="fa fa-bug" aria-hidden="true"></i>
           Reportar problema
         </a>
       </p>
     {% endblock %}
-  </footer>   
+  </footer>
 </div>

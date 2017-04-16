@@ -14,6 +14,7 @@ from . import principal
 
 ########## Rotas ##########
 
+# São utilizados templates personalizados para os seguintes erros
 
 # Erro 403 - Acesso Proibido
 @principal.app_errorhandler(403)

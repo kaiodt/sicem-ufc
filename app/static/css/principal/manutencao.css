@@ -2,24 +2,29 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilos Página Controle de Manutenções - Blueprint Principal
+## Estilos - Página Controle de Manutenções - Blueprint Principal
 ################################################################################
 */
 
+
+/* Botão de visualizar legenda de cores da tabela */
 #botao-legenda {
   float: right;
 }
 
+/* Centralizar células do cabeçalho da tabela */
 .table>thead>tr>th {
   text-align: center;
   vertical-align: middle;
 }
 
+/* Centralizar células do corpo da tabela */
 .table>tbody>tr>td {
   text-align: center;
   vertical-align: middle;  
 }
 
+/* Botão de criar/concluir manutenção - alinhar menu à direita */
 .dropdown-menu.opcoes_manutencao {
   left: unset;
   right: 0;
@@ -27,22 +32,24 @@
 
 /* Filtros */
 
+/* Esconder formulário quando não há filtros selecionados */
 table.filters {
     border-collapse: collapse;
     border-spacing: 4px;
 }
 
+/* Ajustar margens do formulário quando há filtros selecionados */
 table.filters:not(:empty) {
     margin: 12px 0px 20px 0px;
 }
 
-/* Espaço entre o botão do filtro, operação e campo do valor */
+/* Espaço entre o botão do filtro e campos de operação e de valor */
 table.filters tr td {
     padding-right: 5px;
     padding-bottom: 3px;
 }
 
-/* Campos Select2 (operação e valor)*/
+/* Largura dos campos tipo Select2 (operação e valor do filtro) */
 
 .filters .filter-op {
     width: 130px;

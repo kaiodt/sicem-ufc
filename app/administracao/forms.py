@@ -7,7 +7,7 @@
 ################################################################################
 
 
-from datetime import date
+from datetime import date, timedelta
 from flask import request, flash
 from flask_wtf import FlaskForm
 from flask_admin.form.fields import Select2Field, Select2TagsField
@@ -25,7 +25,7 @@ from ..models import *
 from .fields import DateFieldMod
 
 
-########## Formulário Base (Com Tradução) ##########
+########## Formulário Base (Tradução habilitada) ##########
 
 
 class FormBase(FlaskForm):
@@ -49,7 +49,7 @@ class FormEditarCargo(FormBase):
     usuarios = QuerySelectMultipleField('Usuários',
                                         allow_blank=True,
                                         query_factory= lambda: 
-                                        Usuario.query.order_by(Usuario.nome).all())
+                                        Usuario.query.order_by('nome').all())
 
 
 # Criação de Usuário
@@ -66,9 +66,7 @@ class FormCriarUsuario(FormBase):
                                                Length(6, 16)])
 
     cargo = QuerySelectField('Cargo',
-                             query_factory=lambda: Cargo.query.order_by(Cargo.nome).all())
-
-    verificado = BooleanField('Verificado')
+                             query_factory=lambda: Cargo.query.order_by('nome').all())
 
     confirmado = BooleanField('Confirmado')
 
@@ -89,17 +87,25 @@ class FormEditarUsuario(FormBase):
                                              Email()])
 
     cargo = QuerySelectField('Cargo',
-                             query_factory=lambda: Cargo.query.order_by(Cargo.nome).all())
+                             query_factory=lambda: Cargo.query.order_by('nome').all())
 
     verificado = BooleanField('Verificado')
     
-    confirmado = BooleanField('Confirmado')
 
-
+    # Certificar que, se houve alteração no email, o novo é diferente dos já cadastrados
     def validate_email(self, field):
         if Usuario.query.filter_by(email=field.data).first() and \
                 field.data != Usuario.query.get(request.args.get('id')).email:
             raise ValidationError('Email já cadastrado.')
+
+
+    # Avisar ao administrador quando a verificação de um usuário é alterada de 
+    # verdadeira para falsa
+    def validate_verificado(self, field):
+        if Usuario.query.get(request.args.get('id')).verificado and \
+                field.data == False:
+            flash('Você retirou a verificação deste usuário, e ele não poderá mais acessar o sistema.',
+                  'warning')
 
 
 # Criação de Instituição
@@ -116,7 +122,7 @@ class FormEditarInstituicao(FormBase):
     campi = QuerySelectMultipleField('Campi',
                                      allow_blank=True,
                                      query_factory=lambda: 
-                                        Campus.query.order_by(Campus.nome).all())
+                                        Campus.query.order_by('nome').all())
 
 
 # Criação de Campus
@@ -126,10 +132,11 @@ class FormCriarCampus(FormBase):
 
     instituicao = QuerySelectField('Instituição',
                                    query_factory=lambda: 
-                                       Instituicao.query.order_by(Instituicao.nome).all())
+                                       Instituicao.query.order_by('nome').all())
 
     mapeamento = GeoJSONField('Mapeamento', srid=-1, session=db.session,
                               geometry_type='MULTIPOLYGON',
+                              # Aumentar o mapa e centralizar em Fortaleza
                               render_kw={'data-width':400, 'data-height':400,
                                          'data-zoom':10,
                                          'data-lat':-3.7911773, 'data-lng':-38.5893123})
@@ -142,21 +149,24 @@ class FormEditarCampus(FormBase):
 
     instituicao = QuerySelectField('Instituição',
                                    query_factory=lambda: 
-                                       Instituicao.query.order_by(Instituicao.nome).all())
+                                       Instituicao.query.order_by('nome').all())
 
     mapeamento = GeoJSONField('Mapeamento', srid=-1, session=db.session,
                               geometry_type='MULTIPOLYGON',
+                              # Aumentar o mapa
                               render_kw={'data-width':400, 'data-height':400})
 
     centros = QuerySelectMultipleField('Centros',
                                        allow_blank=True,
                                        query_factory=lambda: 
-                                           Centro.query.order_by(Centro.nome).all())
+                                           Centro.query.order_by('nome').all())
 
 
     def __init__(self, *args, **kwargs):
         super(FormEditarCampus, self).__init__(*args, **kwargs)
         
+        # Existe um problema com a extensão Leaflet que não permite
+        # a edição de mapas com polígonos.        
         flash('No momento, a edição de mapeamento não é possível.', 'info')
 
 
@@ -166,10 +176,11 @@ class FormCriarCentro(FormBase):
                                            Length(1, 64)])
 
     campus = QuerySelectField('Campus',
-                              query_factory=lambda: Campus.query.order_by(Campus.nome).all())
+                        query_factory=lambda: Campus.query.order_by('nome').all())
 
     mapeamento = GeoJSONField('Mapeamento', srid=-1, session=db.session,
                               geometry_type='MULTIPOLYGON',
+                              # Aumentar o mapa e centralizar em Fortaleza
                               render_kw={'data-width':400, 'data-height':400,
                                          'data-zoom':10,
                                          'data-lat':-3.7911773, 'data-lng':-38.5893123})
@@ -181,21 +192,23 @@ class FormEditarCentro(FormBase):
                                            Length(1, 64)])
 
     campus = QuerySelectField('Campus',
-                              query_factory=lambda: Campus.query.order_by(Campus.nome).all())
+                        query_factory=lambda: Campus.query.order_by('nome').all())
 
     mapeamento = GeoJSONField('Mapeamento', srid=-1, session=db.session,
                               geometry_type='MULTIPOLYGON',
+                              # Aumentar o mapa
                               render_kw={'data-width':400, 'data-height':400})
 
     departamentos = QuerySelectMultipleField('Departamentos',
-                                             allow_blank=True,
-                                             query_factory=lambda: 
-                                                 Departamento.query.order_by(Departamento.nome).all())
+            allow_blank=True,
+            query_factory=lambda: Departamento.query.order_by('nome').all())
 
 
     def __init__(self, *args, **kwargs):
         super(FormEditarCentro, self).__init__(*args, **kwargs)
-        
+
+        # Existe um problema com a extensão Leaflet que não permite
+        # a edição de mapas com polígonos.
         flash('No momento, a edição de mapeamento não é possível.', 'info')
 
 
@@ -205,7 +218,7 @@ class FormCriarDepartamento(FormBase):
                                            Length(1, 64)])
 
     centro = QuerySelectField('Centro',
-                              query_factory=lambda: Centro.query.order_by(Centro.nome).all())
+                        query_factory=lambda: Centro.query.order_by('nome').all())
 
 
 # Edição de Departamento
@@ -214,11 +227,11 @@ class FormEditarDepartamento(FormBase):
                                            Length(1, 64)])
 
     centro = QuerySelectField('Centro',
-                              query_factory=lambda: Centro.query.order_by(Centro.nome).all())
+                        query_factory=lambda: Centro.query.order_by('nome').all())
 
     blocos = QuerySelectMultipleField('Blocos',
-                                      allow_blank=True,
-                                      query_factory=lambda: Bloco.query.order_by(Bloco.nome).all())
+                            allow_blank=True,
+                            query_factory=lambda: Bloco.query.order_by('nome').all())
 
 
 # Criação de Bloco
@@ -227,11 +240,12 @@ class FormCriarBloco(FormBase):
                                            Length(1, 64)])
 
     departamento = QuerySelectField('Departamento',
-                                    query_factory=lambda: 
-                                        Departamento.query.order_by(Departamento.nome).all())
+                                query_factory=lambda: 
+                                Departamento.query.order_by('nome').all())
 
     localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
                                 geometry_type='POINT',
+                                # Aumentar o mapa e centralizar em Fortaleza
                                 render_kw={'data-width':400, 'data-height':400,
                                            'data-zoom':10,
                                            'data-lat':-3.7911773, 'data-lng':-38.5893123})
@@ -243,24 +257,24 @@ class FormEditarBloco(FormBase):
                                            Length(1, 64)])
 
     departamento = QuerySelectField('Departamento',
-                                    query_factory=lambda: 
-                                        Departamento.query.order_by(Departamento.nome).all())
+            query_factory=lambda: Departamento.query.order_by('nome').all())
 
     localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
                                geometry_type='POINT',
+                               # Aumentar o mapa
                                render_kw={'data-width':400, 'data-height':400})
 
     ambientes = QuerySelectMultipleField('Ambientes',
-                                         allow_blank=True,
-                                         query_factory=lambda: 
-                                             Ambiente.query.order_by(Ambiente.nome).all())
+                allow_blank=True,
+                query_factory=lambda: Ambiente.query.order_by('nome').all())
 
 
-# Criação de Ambiente
+# Criação de Ambiente (Escolha do tipo de ambiente a ser criado)
 class FormCriarAmbiente(FormBase):
     tipo_ambiente = Select2Field('', validators=[InputRequired()],
-        choices=[(tipo.__name__.lower(), tipo.__mapper_args__['polymorphic_identity']) 
-                 for tipo in Ambiente.__subclasses__()])
+                    # Obter os tipos de ambientes automaticamente
+                    choices=[(tipo.endpoint, tipo.nome_formatado_singular) 
+                        for tipo in Ambiente.__subclasses__()])
 
     proximo = SubmitField('Próximo')
 
@@ -275,7 +289,7 @@ class FormCriarAmbienteInterno(FormBase):
                for n in range(1, 11)])
 
     bloco = QuerySelectField('Bloco',
-                             query_factory=lambda: Bloco.query.order_by(Bloco.nome).all())
+                        query_factory=lambda: Bloco.query.order_by('nome').all())
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
@@ -294,7 +308,7 @@ class FormEditarAmbienteInterno(FormBase):
                for n in range(1, 11)])    
 
     bloco = QuerySelectField('Bloco',
-                             query_factory=lambda: Bloco.query.order_by(Bloco.nome).all())
+                        query_factory=lambda: Bloco.query.order_by('nome').all())
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
@@ -303,9 +317,9 @@ class FormEditarAmbienteInterno(FormBase):
     populacao = IntegerField('População', validators=[Optional(), NumberRange(0)])
 
     equipamentos = QuerySelectMultipleField('Equipamentos',
-                                            allow_blank=True,
-                                            query_factory=lambda: 
-                                            Equipamento.query.order_by(Equipamento.tipo_equipamento).all())
+            allow_blank=True,
+            query_factory=lambda: 
+                Equipamento.query.order_by('tipo_equipamento').all())
 
 
 # Criação de Ambiente Externo
@@ -314,7 +328,7 @@ class FormCriarAmbienteExterno(FormBase):
                                            Length(1, 64)])
 
     bloco = QuerySelectField('Bloco',
-                             query_factory=lambda: Bloco.query.order_by(Bloco.nome).all())
+                        query_factory=lambda: Bloco.query.order_by('nome').all())
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
@@ -325,14 +339,14 @@ class FormEditarAmbienteExterno(FormBase):
                                            Length(1, 64)])
 
     bloco = QuerySelectField('Bloco',
-                             query_factory=lambda: Bloco.query.order_by(Bloco.nome).all())
+                        query_factory=lambda: Bloco.query.order_by('nome').all())
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
     equipamentos = QuerySelectMultipleField('Equipamentos',
-                                            allow_blank=True,
-                                            query_factory=lambda: 
-                                            Equipamento.query.order_by(Equipamento.tipo_equipamento).all())
+            allow_blank=True,
+            query_factory=lambda: 
+                Equipamento.query.order_by('tipo_equipamento').all())
 
 
 # Criação de Subestação Abrigada
@@ -342,10 +356,12 @@ class FormCriarSubestacaoAbrigada(FormBase):
 
     bloco = QuerySelectField('Bloco', 
         query_factory=lambda: 
-            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by(Bloco.nome).all())
+            # Mostrar apenas blocos especiais de subestação
+            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by('nome').all())
 
     localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
                                geometry_type='POINT',
+                               # Aumentar o mapa e centralizar em Fortaleza
                                render_kw={'data-width':400, 'data-height':400,
                                           'data-zoom':10,
                                           'data-lat':-3.7911773, 'data-lng':-38.5893123})
@@ -360,18 +376,20 @@ class FormEditarSubestacaoAbrigada(FormBase):
 
     bloco = QuerySelectField('Bloco', 
         query_factory=lambda: 
-            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by(Bloco.nome).all())
+            # Mostrar apenas blocos especiais de subestação
+            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by('nome').all())
 
     localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
                                geometry_type='POINT',
+                               # Aumentar o mapa
                                render_kw={'data-width':400, 'data-height':400})
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
     equipamentos = QuerySelectMultipleField('Equipamentos',
-                                            allow_blank=True,
-                                            query_factory=lambda: 
-                                            Equipamento.query.order_by(Equipamento.tipo_equipamento).all())
+            allow_blank=True,
+            query_factory=lambda: 
+                Equipamento.query.order_by('tipo_equipamento').all())
 
 
 # Criação de Subestação Aérea
@@ -381,10 +399,12 @@ class FormCriarSubestacaoAerea(FormBase):
 
     bloco = QuerySelectField('Bloco', 
         query_factory=lambda: 
-            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by(Bloco.nome).all())
+            # Mostrar apenas blocos especiais de subestação
+            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by('nome').all())
 
     localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
                                geometry_type='POINT',
+                               # Aumentar o mapa e centralizar em Fortaleza
                                render_kw={'data-width':400, 'data-height':400,
                                           'data-zoom':10,
                                           'data-lat':-3.7911773, 'data-lng':-38.5893123})
@@ -399,31 +419,35 @@ class FormEditarSubestacaoAerea(FormBase):
 
     bloco = QuerySelectField('Bloco', 
         query_factory=lambda: 
-            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by(Bloco.nome).all())
+            # Mostrar apenas blocos especiais de subestação
+            Bloco.query.filter(Bloco.nome.like('Subestações%')).order_by('nome').all())
 
     localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
                                geometry_type='POINT',
+                               # Aumentar o mapa
                                render_kw={'data-width':400, 'data-height':400})
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
     equipamentos = QuerySelectMultipleField('Equipamentos',
-                                            allow_blank=True,
-                                            query_factory=lambda: 
-                                            Equipamento.query.order_by(Equipamento.tipo_equipamento).all())
+            allow_blank=True,
+            query_factory=lambda: 
+                Equipamento.query.order_by('tipo_equipamento').all())
 
 
-# Criação de Equipamento
+# Criação de Equipamento (Escolha do tipo de equipamento a ser criado)
 class FormCriarEquipamento(FormBase):
     tipo_equipamento = Select2Field('', validators=[InputRequired()],
-        choices=[(tipo.__name__.lower(), tipo.__mapper_args__['polymorphic_identity']) 
-                 for tipo in Equipamento.__subclasses__()])
+                    # Obter os tipos de equipamentos automaticamente
+                    choices=[(tipo.endpoint, tipo.nome_formatado_singular) 
+                        for tipo in Equipamento.__subclasses__()])
 
     proximo = SubmitField('Próximo')
 
 
 # Criação de Extintor
 class FormCriarExtintor(FormBase):
+    # Caso não haja número de tombamento, usar 0
     tombamento = IntegerField('Tombamento', validators=[NumberRange(0)])
 
     classificacao = Select2Field('Classificação', 
@@ -441,7 +465,7 @@ class FormCriarExtintor(FormBase):
 
     ambiente = QuerySelectField('Ambiente',
                                 query_factory=lambda: 
-                                    Ambiente.query.order_by(Ambiente.nome).all())
+                                    Ambiente.query.order_by('nome').all())
 
     intervalo_manutencao = IntegerField('Intervalo de Manutenção (Meses)',
                                         validators=[InputRequired(), NumberRange(0)])
@@ -451,7 +475,9 @@ class FormCriarExtintor(FormBase):
     info_adicional = TextAreaField('Informações Adicionais')                         
 
 
+    # Certificar que o número de tombamento ainda não existe
     def validate_tombamento(self, field):
+        # Desconsiderar o caso 0 (quando não há número de tombamento)
         if field.data != 0:
             if Equipamento.query.filter_by(tombamento=field.data).first():
                 raise ValidationError('Equipamento já cadastrado.')
@@ -459,6 +485,7 @@ class FormCriarExtintor(FormBase):
 
 # Edição de Extintor
 class FormEditarExtintor(FormBase):
+    # Caso não haja número de tombamento, usar 0
     tombamento = IntegerField('Tombamento', validators=[NumberRange(0)])
 
     classificacao = Select2Field('Classificação', 
@@ -476,7 +503,7 @@ class FormEditarExtintor(FormBase):
 
     ambiente = QuerySelectField('Ambiente',
                                 query_factory=lambda: 
-                                    Ambiente.query.order_by(Ambiente.nome).all())
+                                    Ambiente.query.order_by('nome').all())
 
     intervalo_manutencao = IntegerField('Intervalo de Manutenção (Meses)',
                                         validators=[InputRequired(),
@@ -490,14 +517,20 @@ class FormEditarExtintor(FormBase):
                                            query_factory=lambda: Manutencao.query.all(),
                                            allow_blank=True)
 
-    proxima_manutencao = DateField('Próxima Manutenção', widget=DatePickerWidget(),
-                                   render_kw={'data-date-format': 'DD.MM.YYYY'},
-                                   format='%d.%m.%Y',
-                                   default=date.today())
+
+    # Certificar que, se houve alteração no número de tombamento, o novo número
+    # não é de um equipamento já existente
+    def validate_tombamento(self, field):
+        # Desconsiderar o caso 0 (quando não há número de tombamento)
+        if field.data != 0:
+            if Equipamento.query.filter_by(tombamento=field.data).first() and \
+               field.data != Equipamento.query.get(request.args.get('id')).tombamento:
+                raise ValidationError('Equipamento já cadastrado.')
 
 
 # Criação de Condicionador de Ar
 class FormCriarCondicionadorAr(FormBase):
+    # Caso não haja número de tombamento, usar 0
     tombamento = IntegerField('Tombamento', validators=[NumberRange(0)])
 
     classificacao = Select2Field('Classificação', 
@@ -526,7 +559,7 @@ class FormCriarCondicionadorAr(FormBase):
 
     ambiente = QuerySelectField('Ambiente',
                                 query_factory=lambda: 
-                                    Ambiente.query.order_by(Ambiente.nome).all())
+                                    Ambiente.query.order_by('nome').all())
 
     intervalo_manutencao = IntegerField('Intervalo de Manutenção (Meses)',
                                         validators=[InputRequired(), NumberRange(0)])
@@ -536,7 +569,9 @@ class FormCriarCondicionadorAr(FormBase):
     info_adicional = TextAreaField('Informações Adicionais')                         
 
 
+    # Certificar que o número de tombamento ainda não existe
     def validate_tombamento(self, field):
+        # Desconsiderar o caso 0 (quando não há número de tombamento)
         if field.data != 0:
             if Equipamento.query.filter_by(tombamento=field.data).first():
                 raise ValidationError('Equipamento já cadastrado.')
@@ -544,6 +579,7 @@ class FormCriarCondicionadorAr(FormBase):
 
 # Edição de Condicionador de Ar
 class FormEditarCondicionadorAr(FormBase):
+    # Caso não haja número de tombamento, usar 0
     tombamento = IntegerField('Tombamento', validators=[NumberRange(0)])
 
     classificacao = Select2Field('Classificação', 
@@ -572,7 +608,7 @@ class FormEditarCondicionadorAr(FormBase):
 
     ambiente = QuerySelectField('Ambiente',
                                 query_factory=lambda: 
-                                    Ambiente.query.order_by(Ambiente.nome).all())
+                                    Ambiente.query.order_by('nome').all())
 
     intervalo_manutencao = IntegerField('Intervalo de Manutenção (Meses)',
                                         validators=[InputRequired(), NumberRange(0)])
@@ -585,13 +621,11 @@ class FormEditarCondicionadorAr(FormBase):
                                            query_factory=lambda: Manutencao.query.all(),
                                            allow_blank=True)
 
-    proxima_manutencao = DateField('Próxima Manutenção', widget=DatePickerWidget(),
-                                   render_kw={'data-date-format': 'DD.MM.YYYY'},
-                                   format='%d.%m.%Y',
-                                   default=date.today())
 
-
+    # Certificar que, se houve alteração no número de tombamento, o novo número
+    # não é de um equipamento já existente
     def validate_tombamento(self, field):
+        # Desconsiderar o caso 0 (quando não há número de tombamento)
         if field.data != 0:
             if Equipamento.query.filter_by(tombamento=field.data).first() and \
                field.data != Equipamento.query.get(request.args.get('id')).tombamento:
@@ -600,6 +634,7 @@ class FormEditarCondicionadorAr(FormBase):
 
 # Criação de Manutenção
 class FormCriarManutencao(FormBase):
+    # Caso não haja número de ordem de serviço, usar 0
     num_ordem_servico = IntegerField('Número da Ordem de Serviço',
                                      validators=[InputRequired(),
                                                  NumberRange(0)])
@@ -622,9 +657,9 @@ class FormCriarManutencao(FormBase):
                                             ('Inicial', 'Inicial')])
 
     equipamento = QuerySelectField('Equipamento',
-                  query_factory=lambda: 
-                  Equipamento.query.filter_by(em_uso=True).filter_by(em_manutencao=False)\
-                                   .order_by(Equipamento.tipo_equipamento).all())
+        query_factory=lambda: 
+            Equipamento.query.filter_by(em_uso=True).filter_by(em_manutencao=False)\
+                             .order_by('tipo_equipamento').all())
 
     descricao_servico = TextAreaField('Descrição do Serviço')
 
@@ -632,39 +667,74 @@ class FormCriarManutencao(FormBase):
                                              ('Concluída', 'Concluída')])
 
 
+    # Inicialização
     def __init__(self, *args, **kwargs):
         super(FormCriarManutencao, self).__init__(*args, **kwargs)
 
         # Caso o id de um equipamento esteja presente na query string, o campo
         # de equipamento é automaticamente preenchido
         if request.args.get('id'):
+            # Buscar equipamento no banco de dados e preencher campo no formulário
             self.equipamento.data = Equipamento.query.get(request.args.get('id'))
+
+            # Desativar edição do campo de equipamento
             self.equipamento.render_kw = dict(disabled='disabled')
 
             # Caso um parâmetro de tipo de manutenção seja passado pela query string,
             # alguns campos relevantes são preenchidos automaticamente, de acordo com
             # o tipo de manutenção
+
+            # Manutenção tipo inicial
             if request.args.get('tipo') == 'inicial':
+                # Preencher o campo de tipo de manutenção e desabilitar sua edição
                 self.tipo_manutencao.data = 'Inicial'
                 self.tipo_manutencao.render_kw = dict(disabled='disabled')
 
+                # Preencher o campo de status e desabilitar sua edição
                 self.status.data = 'Concluída'
                 self.status.render_kw = dict(disabled='disabled')
 
+
+    # Certificar que o número da ordem de serviço seja diferente dos já existentes
     def validate_num_ordem_servico(self, field):
+        # Desconsiderar o caso 0 (quando não há número de ordem de serviço)
         if field.data != 0:
             if Manutencao.query.filter_by(num_ordem_servico=field.data).first():
                 raise ValidationError('Manutenção já cadastrada.')
 
+
+    # Certificar que a data de abertura não seja no futuro
+    def validate_data_abertura(self, field):
+      if field.data > date.today():
+        raise ValidationError('Não é possível cadastrar datas no futuro.')
+
+
+    # Certificar que, se a manutenção foi concluída, uma data de conclusão foi 
+    # inserida e que esta data não seja no futuro, nem anterior à data de abertura
     def validate_data_conclusao(self, field):
         if self.status.data == 'Concluída':
+            # Testar se foi inserida data de conclusão
             if field.data is None:
                 raise ValidationError('Cadastre a data de conclusão.')
+            
+            # Testar se a data está no futuro
+            if field.data > date.today():
+                raise ValidationError('Não é possível cadastrar datas no futuro.')
 
+            # Testar se a data de conclusão não é anterior à data de abertura
+            if field.data < self.data_abertura.data:
+                raise ValidationError('Data de conclusão anterior à data de abertura.')
+
+
+    # Certificar que não seja possível abrir uma nova manutenção para
+    # um equipamento que já possua uma manutenção aberta
     def validate_equipamento(self, field):
         if self.status.data == 'Aberta' and field.data.em_manutencao:
             raise ValidationError('Equipamento já em manutenção. Conclua a última manutenção.')
 
+
+    # Certificar que se uma data de conclusão foi inserida, o status da 
+    # manutenção deve ser "Concluída"
     def validate_status(self, field):
         if self.data_conclusao.data:
             if field.data == 'Aberta':
@@ -673,8 +743,23 @@ class FormCriarManutencao(FormBase):
                      Data de Conclusão em branco.')
 
 
+    # Certificar que não seja possível criar uma manutenção inicial para
+    # um equipamento que já possua uma.
+    # A manutenção inicial só será cadastrada por meio deste formulário quando
+    # um equipamento é criado e o usuário opta por cadastrar uma manutenção
+    # inicial personalizada.
+    def validate_tipo_manutencao(self, field):
+        # Caso haja o argumento 'tipo' com valor 'inicial' na query string, esta
+        # é de fato a manutenção inicial do equipamento, e será validada, do contrário,
+        # não será possível criar outra manutenção inicial.
+        if field.data == 'Inicial' and request.args.get('tipo') != 'inicial':
+            raise ValidationError(
+                'Este equipamento já possui manutenção inicial. Edite a exstente.')
+
+
 # Edição de Manutenção
 class FormEditarManutencao(FormBase):
+    # Caso não haja número de ordem de serviço, usar 0
     num_ordem_servico = IntegerField('Número da Ordem de Serviço',
                                      validators=[InputRequired(),
                                                  NumberRange(0)])
@@ -695,8 +780,9 @@ class FormEditarManutencao(FormBase):
                                             ('Inicial', 'Inicial')])
 
     equipamento = QuerySelectField('Equipamento',
-                  query_factory=lambda: 
-                  Equipamento.query.filter_by(em_uso=True).order_by(Equipamento.tipo_equipamento).all())
+        query_factory=lambda: 
+            Equipamento.query.filter_by(em_uso=True)\
+                             .order_by('tipo_equipamento').all())
 
     descricao_servico = TextAreaField('Descrição do Serviço')
 
@@ -704,15 +790,74 @@ class FormEditarManutencao(FormBase):
                                              ('Concluída', 'Concluída')])
 
 
+    # Inicialização
+    def __init__(self, *args, **kwargs):
+        super(FormEditarManutencao, self).__init__(*args, **kwargs)
+
+        # A edição do campo de equipamento sempre será desabilitada, para evitar
+        # comprometimento do banco de dados.
+        self.equipamento.render_kw = dict(disabled='disabled')
+
+        # Obter o id da manutenção
+        id_manutencao = request.args.get('id')
+
+        # Caso a manutenção seja do tipo inicial, desabilitar edição dos campos
+        # de tipo de manutenção e de status
+        if Manutencao.query.get(id_manutencao).tipo_manutencao == 'Inicial':
+            self.tipo_manutencao.render_kw = dict(disabled='disabled')
+            self.status.render_kw = dict(disabled='disabled')
+
+
+    # Certificar que, se houve alteração no número da ordem de serviço,
+    # o novo número seja diferente dos já existentes
+    def validate_num_ordem_servico(self, field):
+        # Desconsiderar o caso 0 (quando não há número de ordem de serviço)
+        if field.data != 0:
+            if Manutencao.query.filter_by(num_ordem_servico=field.data).first() and \
+               field.data != Manutencao.query.get(request.args.get('id')).num_ordem_servico:
+                raise ValidationError('Manutenção já cadastrada.')
+
+
+    # Certificar que a data de abertura não seja no futuro
+    def validate_data_abertura(self, field):
+      if field.data > date.today():
+        raise ValidationError('Não é possível cadastrar datas no futuro.')
+
+
+    # Certificar que, se a manutenção foi concluída, uma data de conclusão foi 
+    # inserida e que esta data não seja no futuro, nem anterior à data de abertura
     def validate_data_conclusao(self, field):
         if self.status.data == 'Concluída':
+            # Testar se foi inserida data de conclusão
             if field.data is None:
                 raise ValidationError('Cadastre a data de conclusão.')
+            
+            # Testar se a data está no futuro
+            if field.data > date.today():
+                raise ValidationError('Não é possível cadastrar datas no futuro.')
 
+            # Testar se a data de conclusão não é anterior à data de abertura
+            if field.data < self.data_abertura.data:
+                raise ValidationError('Data de conclusão anterior à data de abertura.')
+
+
+    # Certificar que se uma data de conclusão foi inserida, o status da 
+    # manutenção deve ser "Concluída"
     def validate_status(self, field):
         if self.data_conclusao.data:
             if field.data == 'Aberta':
                 raise ValidationError(
                     'Data de Conclusão cadastrada. Mude Status para "Concluída" ou deixe \
                      Data de Conclusão em branco.')
+
+
+    # Certificar que não seja possível mudar o tipo de manutenção para 'Inicial',
+    # pois o equipamento só pode ter uma manutenção inicial
+    def validate_tipo_manutencao(self, field):
+        # Caso a própria manutenção inicial não esteja sendo editada e o usuário
+        # tentar mudar o tipo de manutenção para 'Inicial', não será validado.
+        if field.data == 'Inicial' and \
+                Manutencao.query.get(request.args.get('id')).tipo_manutencao != 'Inicial':
+            raise ValidationError(
+                'Este equipamento já possui manutenção inicial. Edite a exstente.')
 

@@ -60,6 +60,8 @@ def FiltrosDatas(coluna, nome):
 
 ########## Filtros Modificados ##########
 
+# Os filtros utilizados são fornecidos pelo Flask-Admin, mas alguns
+# precisam de pequenas correções, como segue:
 
 # Filtros tipo fora da lista (Problema na tradução)
 

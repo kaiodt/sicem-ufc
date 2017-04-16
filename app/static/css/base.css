@@ -2,25 +2,19 @@
 ################################################################################
 ## SICEM - UFC 
 ################################################################################
-## Estilo Base
+## Estilos - Base
 ################################################################################
 */
 
 
+/* Configurações gerais */
 body {
   padding-top: 20px;
   font-family: 'Lora', serif;
   color: #555;
 }
 
-.page-header {
-  margin-top: 0px;
-}
-
-.page-header h1{
-  margin-top: 0px;
-}
-
+/* Rodapé */
 .footer {
   padding-top: 40px;
   padding-bottom: 10px;
@@ -28,20 +22,139 @@ body {
   border-top: 1px solid #eee;
 }
 
+/* Botão "Reportar problema" no rodapé */
+.footer a {
+  float: right;
+  text-decoration: none;
+}
+
+/* Cabeçalho */
+.app-header {
+  display: flex;
+  align-items: center;
+  flex-flow: row wrap;
+  margin-bottom: 10px;
+}
+
+/* Título da aplicação - esquerda do cabeçalho */
+.app-title {
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Logo da UFC */
+.app-title img {
+  height: 50px;
+  padding-right: 10px;
+  margin-right: 10px;
+  border-right: 2px solid #777;
+}
+
+/* Tamanho padrão do título */
+.app-title span {
+  font-size: 22px;
+}
+
+/* Tamanho do título para telas com largura entre 380px e 550px */
+@media (max-width: 550px) {
+  .app-header span {
+    font-size: 15px;
+  }
+}
+
+/* Tamanho do título para telas com largura entre 350px e 380px */
+@media (max-width: 380px) {
+  .app-header span {
+    font-size: 12px;
+  }
+}
+
+/* Tamanho do título para telas com largura até 350px */
+@media (max-width: 350px) {
+  .app-header span {
+    font-size: 10px;
+  }
+}
+
+/* Botão "Minha Conta" - direita do cabeçalho */
+#minha-conta-btn {
+  border: 0;
+  color: #777;
+  font-size: 17px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+/* Mudar cor e sombreamento do botão "Minha Conta" ao passar com o mouse ou clicar */
+#minha-conta-btn:hover,
+#minha-conta-btn:focus,
+#minha-conta-btn:active {
+  color: #333;
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+/* Menu do usuário - ativado pelo botão "Minha Conta" */
+.user-header {
+  text-align: right;
+  font-size: 17px;
+}
+
+/* Links do menu do usuário */
+.user-header a {
+  color: #777;
+  padding-left: 15px;
+  transition: all 0.5s;
+  -webkit-transition: all 0.5s;
+  -moz-transition: all 0.5s;
+}
+
+/* Mudar cor dos links do menu do usuário ao passar o mouse */
+.user-header a:hover,
+.user-header a:focus {
+  text-decoration: none;
+  color: #333;
+}
+
+/* Alinhar menu do usuário à direita */
+.user-header .dropdown-menu {
+  left: unset;
+  right: 0;
+  font-size: 15px;
+}
+
+/* Links do menu do usuário */
+.user-header .dropdown-menu a {
+  color: #777;
+}
+
+/* Ícones do menu do usuário */
+.user-header .dropdown-menu i {
+  width: 18px;
+}
+
+/* Barra de Navegação */
+
+/* Margem inferior */
 nav {
   margin-bottom: 20px;
 }
 
+/* Retirar bordas e padding das laterais */
 .navbar-collapse {
   border: none;
   padding-left: 0;
   padding-right: 0;
 }
 
+/* Alinhar à esquerda o botão de acesso à barra de navegação quando está colapsada */
 .navbar-toggle {
   float: left;
 }
 
+/* Configurações dos links da barra de navegação (tema extraído do bootstrap) */
 .nav-justified > li > a,
 .navbar-toggle {
   color: #777;
@@ -63,12 +176,14 @@ nav {
   -moz-transition: all 0.5s;
 }
 
+/* Outras configurações dos links da barra de navegação */
 .nav-justified > li > a {
   padding-top: 15px;
   padding-bottom: 15px;
   margin-bottom: 0; 
 }
 
+/* Mudar cor e sombreamento dos links da barra de navegação quando passar o mouse */
 .nav-justified > li > a:hover,
 .nav-justified > li > a:focus,
 .navbar-toggle:hover {
@@ -79,6 +194,7 @@ nav {
   -moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.15);
 }
 
+/* Mudar cor e sombreamento do link correspondente à página que está ativa */
 .nav-justified > .active > a {
   background-color: #ddd;
   background-image: none;
@@ -87,6 +203,7 @@ nav {
   -moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.15);
 }
 
+/* Mudar apenas sombreamento do link da página ativa quando passar o mouse */
 .nav-justified > .active > a:hover,
 .nav-justified > .active > a:focus {
   background-color: #ddd;
@@ -96,36 +213,42 @@ nav {
   -moz-box-shadow: inset 0 3px 7px rgba(0,0,0,.30);
 }
 
+/* Arredondar bordas externas do primeiro link da barra de navegação */
 .nav-justified > li:first-child > a {
   border-radius: 5px 5px 0 0;
   border-top: 1px solid #ccc;
 }
 
+/* Arredondar bordas externas do último link da barra de navegação */
 .nav-justified > li:last-child > a {
   border-radius: 0 0 5px 5px;
 }
 
+/* Configurações da barra de navegação quando está na vertical */
 @media (min-width: 768px) {
+  /* Bordas dos links internos da barra de navegação */
   .nav-justified > li > a {
     border-top: 1px solid #ccc;
     border-right: 1px solid #d5d5d5;
     border-left: 1px solid #fff;
   }
 
+  /* Arredondar bordas externas do primeiro link da barra de navegação */
   .nav-justified > li:first-child > a {
     border-left: 1px solid #ccc;
     border-radius: 5px 0 0 5px;
   }
 
+  /* Arredondar bordas externas do último link da barra de navegação */
   .nav-justified > li:last-child > a {
     border-right: 1px solid #ccc;
     border-radius: 0 5px 5px 0;
   }
 }
 
-/* Responsive: Portrait tablets and up */
+/* Para telas com largura maior que 768px */
 @media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
+  /* Retirar padding das laterais */
   .masthead,
   .footer {
     padding-right: 0;
@@ -133,99 +256,12 @@ nav {
   }
 }
 
-.app-header {
-  display: flex;
-  align-items: center;
-  flex-flow: row wrap;
-  margin-bottom: 10px;
+/* Título da Página */
+
+.page-header {
+  margin-top: 0px;
 }
 
-.app-title {
-  display: inline-flex;
-  align-items: center;
-}
-
-.app-title img {
-  height: 50px;
-  padding-right: 10px;
-  margin-right: 10px;
-  border-right: 2px solid #777;
-}
-
-.app-title span {
-  font-size: 22px;
-}
-
-.user-header {
-  text-align: right;
-  font-size: 17px;
-}
-
-.user-header a {
-  color: #777;
-  padding-left: 15px;
-  transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-}
-
-.user-header a:hover,
-.user-header a:focus {
-  text-decoration: none;
-  color: #333;
-}
-
-.user-header .dropdown-menu {
-  left: unset;
-  right: 0;
-  font-size: 15px;
-}
-
-.user-header .dropdown-menu a {
-  color: #777;
-}
-
-.user-header .dropdown-menu i {
-  width: 18px;
-}
-
-#minha-conta-btn {
-  border: 0;
-  color: #777;
-  font-size: 17px;
-  transition: all 0.5s;
-  -webkit-transition: all 0.5s;
-  -moz-transition: all 0.5s;
-}
-
-#minha-conta-btn:hover,
-#minha-conta-btn:focus,
-#minha-conta-btn:active {
-  color: #333;
-  border-color: transparent;
-  background-color: transparent;
-  box-shadow: none;
-}
-
-@media (max-width: 550px) {
-  .app-header span {
-    font-size: 15px;
-  }
-}
-
-@media (max-width: 380px) {
-  .app-header span {
-    font-size: 12px;
-  }
-}
-
-@media (max-width: 350px) {
-  .app-header span {
-    font-size: 10px;
-  }
-}
-
-.footer a {
-  float: right;
-  text-decoration: none;
+.page-header h1{
+  margin-top: 0px;
 }
