@@ -1,18 +1,29 @@
+{# Template da página de login #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
+
+{# Importar geração de formulários do bootstrap #}
 {% import "bootstrap/wtf.html" as wtf %}
 
+{# Título da Página #}
 
 {% block page_title %}Login{% endblock %}
 
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="page-header">
     <h1>Login</h1>  
   </div>
   
+  {# Formulário de login #}
   <div class="col-md-4">
     {{ wtf.quick_form(form) }}
+
     <br>
+
+    {# Link para recuperação de senha #}
     <p>
       <a href="{{ url_for('autenticacao.pedido_recuperacao_senha') }}">
         Esqueci minha senha

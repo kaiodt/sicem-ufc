@@ -1,10 +1,7 @@
-{# Template para as Views de Criação do Painel de Administração #}
+{# Template para as views de criação do painel de administração #}
 
-
-{# Estende o template original do Flask-Admin #}
-
+{# Estende o template original de view de criação do Flask-Admin #}
 {% extends 'admin/model/create.html' %}
-
 
 {# Título da Página #}
 
@@ -14,37 +11,47 @@
 
 
 {% block head %}
+  {# Parte original do template do Flask-Admin #}
   {{ super() }}
 
-  {# Incluir CSS comum do painel de administração #}
+  {# Incluir CSS comum às páginas do painel de administração #}
   {% include 'administracao/head.html' %}
 
-  {# CSS adicional #}
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/administracao/criar.css') }}">
 {% endblock %}
 
-{# Conteúdo da Página #}
+{# Corpo da Página #}
 
 {% block page_body %}
+  {# Incluir cabeçalho da aplicação e barra de navegação #}
   {% include 'administracao/topo.html' %}
+
+  {# Conteúdo da Página #}
 
   {% block body %}
     <div class="container">
+      {# Mostrar nome da view atual #}
       <h3 style="margin-top: 0px;">
         {{ admin_view.name }}
       </h3>
 
-      {# Parte original da view de criação Flask-Admin #}
-      {{ super() }} 
+      {# Parte original do template do Flask-Admin #}
+      {{ super() }}
+
     </div>
   {% endblock %}
 {% endblock %}
 
+{# Parte Inferior da Página #}
 
 {% block tail %}
-  
+  {# Incluir rodapé #}
   {% include 'administracao/rodape.html' %}
+
+  {# Incluir JavaScript das extensões e dos formulários #}
   {% include 'administracao/form_scripts.html' %}
 
+  {# Incluir JavaScript específico desta página #}
   <script type="text/javascript" src="{{ url_for('static', filename='js/administracao/criar.js') }}"></script>
 {% endblock %}

@@ -1,8 +1,13 @@
+{# Template da página de usuário não confirmado #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
 
+{# Título da Página #}
 
 {% block page_title %}Usuário Não Confirmado{% endblock %}
 
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="page-header">
@@ -16,6 +21,7 @@
 
   <p>Confira também o seu lixo eletrônico, o email de confirmação pode ter sido classificado incorretamente como spam.</p>
   
+  {# Link para reenvio de email de confirmação #}
   <p>
     Precisa de outro email de confirmação?
     <a href="{{ url_for('autenticacao.reenviar_confirmacao') }}">

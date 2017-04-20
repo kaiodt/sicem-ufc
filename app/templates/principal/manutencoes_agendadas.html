@@ -1,27 +1,40 @@
+{# Template da página de listagem de manutenções agendadas #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
+
+{# Importar macros - funções auxiliares #}
 {% import "macros.html" as macros with context %}
 
+{# Título da Página #}
 
 {% block page_title %}Manutenções Agendadas{% endblock %}
 
+{# Definir aba ativa #}
+{% set active_tab = 'manutencao' %}
+
 
 {% block head %}
+  {# Parte original do template base #}
   {{ super() }}
+
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/manutencao.css') }}">
+
+  {# Incluir CSS de extensões sendo utilizadas #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/select2/select2.css', v='3.5.2') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/select2/select2-bootstrap3.css', v='1.4.6') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/daterangepicker/daterangepicker-bs3.css', v='1.3.22') }}">
 {% endblock %}
 
-
-{% set active_tab = 'manutencao' %}
-
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="page-header">
     <h1>Controle de Manutenções</h1>  
   </div>
-  
+
+  {# Abas para seleção entre manutenções abertas e agendadas e adição de filtros #}  
   <ul class="nav nav-tabs">
     <li role="presentation">
       <a href="{{ url_for('principal.manutencoes_abertas') }}">
@@ -35,25 +48,28 @@
       </a>
     </li>
 
-    <!-- Filtros -->
+    {# Adição de filtros #}
     {% if filtros %}
       <li class="dropdown">
         {{ macros.filter_options() }}
       </li>
     {% endif %}
 
+    {# Botão para acessar a legenda de cores #}
     <button id="botao-legenda" type="button" class="btn btn-default" data-toggle="modal" data-target="#modalLegenda">
       Legenda
     </button>
   </ul>
 
+  {# Local onde serão adicionados os formulários dos filtros quando são adicionados #}
 
   {% if filtros %}
     {{ macros.filter_form() }}
     <div class="clearfix"></div>
   {% endif %}
 
-  
+  {# Tabela com a listagem de manutenções agendadas #}
+
   <table class="table table-hover">
     <thead>
       <tr>
@@ -74,6 +90,10 @@
     {% if equip_man_agendada %}
       <tbody>
         {% for equipamento in equip_man_agendada %}
+          {# Classificação de cores: #}
+          {# Atrasada = Vermelho #}
+          {# Menos de 7 dias para próxima manutenção = Amarelo #}
+          {# Menos de 30 dias para próxima manutenção = Azul #}
           {% if (equipamento.proxima_manutencao - data_hoje).days < 0 %}
             <tr class="danger">
           {% elif (equipamento.proxima_manutencao - data_hoje).days <= 7 %}
@@ -91,6 +111,8 @@
               <td>{{ equipamento.ambiente.bloco.departamento.centro.nome }}</td>
               <td>{{ equipamento.ambiente.bloco.departamento.centro.campus.nome }}</td>
               <td>{{ equipamento.proxima_manutencao.strftime('%d.%m.%Y') }}</td>
+
+            {# Se o usuário puder realizar cadastros, é dada a opção de criar a manutenção - redirecionamento para view de criação de manutenção #}
             {% if current_user.pode_cadastrar() %}
               <td>
                 <div class="dropdown">
@@ -119,7 +141,8 @@
   {% endif %}
 
 
-  <!-- Paginação -->
+  {# Paginação #}
+
   {% if pagination %}
     <div class="pagination">
       {{ macros.pagination_widget(pagination, 'principal.manutencoes_agendadas') }}
@@ -127,7 +150,8 @@
   {% endif %}
 
 
-  <!-- Modal de Legenda-->
+  {# Modal de Legenda de Cores #}
+
   <div class="modal fade" id="modalLegenda" tabindex="-1" role="dialog" aria-labelledby="labelModalLegenda">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -158,16 +182,22 @@
   </div>  
 {% endblock %}
 
+{# Inclusão de JavaScript #}
 
 {% block scripts %}
+  {# Parte original do template base #}
   {{ super() }}
+
+  {# Incluir JavaScript de extensões sendo utilizadas #}
   <script type="text/javascript" src="{{ url_for('static', filename='externo/select2/select2.min.js', v='3.5.2') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='externo/moment.min.js', v='2.9.0') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='externo/daterangepicker/daterangepicker.js', v='1.3.22') }}"></script>
 
+  {# Incluir JavaScript de formulários e filtros (Adaptados do Flask-Admin) #}
   <script type="text/javascript" src="{{ url_for('static', filename='externo/form.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='externo/filters.js') }}"></script>
 
+  {# JavaScript de identificação dos filtros disponíveis e ativos (Copiado do Flask-Admin) #}
   <script language="javascript">
       (function($) {
           $('[data-role=tooltip]').tooltip({

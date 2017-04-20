@@ -1,29 +1,43 @@
+{# Template da página inicial do painel de administração #}
+
+{# Estende o template original do Flask-Admin #}
+
 {% extends 'admin/master.html' %}
 
+{# Título da Página #}
 
 {% block title %}Home | Administração -  SICEM-UFC{% endblock %}
 
 
 {% block head %}
   {{ super() }}
+
+  {# Incluir CSS comum às páginas do painel de administração #}
   {% include 'administracao/head.html' %}
 {% endblock %}
 
+{# Corpo da Página #}
 
 {% block page_body %}
+  {# Incluir cabeçalho da aplicação e barra de navegação #}
   {% include 'administracao/topo.html' %}
 
-  {% block body %}
-  <div class="container">
-    <h1>Painel de Administração</h1>
+  {# Conteúdo da Página #}
 
-    <h3>Utilize a barra de navegação acima para manipular o banco de dados.</h3>    
-  </div>
+  {% block body %}
+    <div class="container">
+      <h1>Painel de Administração</h1>
+
+      <h3>Utilize a barra de navegação acima para manipular o banco de dados.</h3>    
+    </div>
   {% endblock %}
 {% endblock %}
 
+{# Parte Inferior da Página #}
 
 {% block tail %}
   {{ super() }}
+
+  {# Incluir rodapé #}
   {% include 'administracao/rodape.html' %} 
 {% endblock %}

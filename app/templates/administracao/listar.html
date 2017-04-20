@@ -1,5 +1,9 @@
+{# Template da view de listagem do painel de administração #}
+
+{# Estende o template original de view de listagem do Flask-Admin #}
 {% extends 'admin/model/list.html' %}
 
+{# Título da Página #}
 
 {% block title %}
   {{ admin_view.name }} | Administração -  SICEM-UFC
@@ -7,32 +11,51 @@
 
 
 {% block head %}
+  {# Parte original do template do Flask-Admin #}
   {{ super() }}
+
+  {# Incluir CSS comum às páginas do painel de administração #}
   {% include 'administracao/head.html' %}
+
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/administracao/listar.css') }}">
 {% endblock %}
 
+{# Corpo da Página #}
 
 {% block page_body %}
+  {# Incluir cabeçalho da aplicação e barra de navegação #}
   {% include 'administracao/topo.html' %}
+
+  {# Conteúdo da Página #}
 
   {% block body %}
     <div class="container">
+      {# Mostrar nome da view atual #}
       <h3 style="margin-top: 0px;">
         {{ admin_view.name }}
       </h3>
+
+      {# Parte original do template do Flask-Admin #}
       {{ super() }} 
+
     </div>
   {% endblock %}
 {% endblock %}
 
+{# Parte Inferior da Página #}
 
 {% block tail %}
+  {# Incluir rodapé #}
   {% include 'administracao/rodape.html' %}
 
+  {# Incluir JavaScript modificado dos filtros #}
   <script type="text/javascript" src="{{ url_for('static', filename='externo/filters.js') }}"></script>
 
+  {# Incluir JavaScript das extensões e dos formulários #}
   {% include 'administracao/form_scripts.html' %}
+
+  {# Parte original do template do Flask-Admin #}
 
   {{ actionlib.script(_gettext('Please select at least one record.'),
                       actions,

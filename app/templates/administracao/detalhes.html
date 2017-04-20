@@ -1,6 +1,13 @@
+{# Template para as views de detalhes do painel de administração #}
+
+{# Estende o template original de view de detalhes do Flask-Admin #}
 {% extends 'admin/model/details.html' %}
+
+{# Importar funcionalidades do Flask-Admin #}
+
 {% import 'admin/lib.html' as lib with context %}
 
+{# Título da Página #}
 
 {% block title %}
   {{ admin_view.name }} | Administração -  SICEM-UFC
@@ -8,29 +15,48 @@
 
 
 {% block head %}
+  {# Parte original do template do Flask-Admin #}
   {{ super() }}
   {{ lib.form_css() }}
+
+  {# Incluir CSS comum às páginas do painel de administração #}
   {% include 'administracao/head.html' %}
+
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/administracao/detalhes.css') }}">
 {% endblock %}
 
+{# Corpo da Página #}
 
 {% block page_body %}
+  {# Incluir cabeçalho da aplicação e barra de navegação #}
   {% include 'administracao/topo.html' %}
+
+  {# Conteúdo da Página #}
 
   {% block body %}
     <div class="container">
+      {# Mostrar nome da view atual #}
       <h3 style="margin-top: 0px;">
         {{ admin_view.name }}
       </h3>
+
+      {# Parte original do template do Flask-Admin #}
       {{ super() }} 
+
     </div>
   {% endblock %}
 {% endblock %}
 
+{# Parte Inferior da Página #}
 
 {% block tail %}
+  {# Parte original do template do Flask-Admin #}
   {{ super() }}
+
+  {# Incluir rodapé #}
   {% include 'administracao/rodape.html' %}
+
+  {# Incluir JavaScript das extensões e dos formulários #}
   {% include 'administracao/form_scripts.html' %}
 {% endblock %}

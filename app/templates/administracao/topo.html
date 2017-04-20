@@ -1,16 +1,21 @@
-{# Cabeçalho #}
+{# Cabeçalho - Comum a todas as páginas do painel de administração #}
 
 <div class="container">
   <div class="masthead">
     <div class="row">
       <div class="app-header">
+
+        {# Título da Aplicação #}
         <div class="app-title col-sm-8 col-xs-12">
           <a href="{{ url_for('principal.home') }}">
             <img src="{{url_for('static', filename='images/UFC_logo.png') }}" alt="UFC-Logo">
           </a>
           <span class="text-muted">Sistema de Controle de Equipamentos e Manutenções</span>
         </div>
+
+        {# Menu do Usuário #}
         <div class="user-header col-sm-4 col-xs-12">
+          {# Se o usuário estiver logado, mostrar o menu de opções de usuário #}
           {% if current_user.is_authenticated %}
             <div class="btn-group">
               <button id="minha-conta-btn" type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
@@ -23,6 +28,8 @@
                   </a>
                 </li>
                 <li role="separator" class="divider"></li>
+
+                {# Se o  usuário for cadastrador/administrador, mostrar acesso ao painel de administração #}
                 {% if current_user.pode_cadastrar() %}
                   <li>
                     <a href="{{ url_for('admin.index') }}">
@@ -48,6 +55,8 @@
                 </li>
               </ul>
             </div>
+
+          {# Caso o usuário não esteja logado, mostrar botões de cadastro e login #}
           {% else %}
             <a href="{{ url_for('autenticacao.cadastro_usuario') }}">
               <i class="fa fa-user-plus" aria-hidden="true"></i> Cadastro
@@ -62,7 +71,8 @@
   </div>    
 </div>
 
-{# Barra de Navegação #}
+{# Barra de Navegação - Colapsada quando a largura da tela for menor que 768px #}
+{# Parte adaptada do template original do Flask-Admin #}
 
 <div class="container">
   <nav class="navbar navbar-default" role="navigation">
@@ -74,6 +84,8 @@
         <span class="icon-bar"></span>
       </button>
       
+      {# Link para a página inicial da aplicação #}
+
       {% block brand %}
         <a class="navbar-brand" href="{{ url_for('principal.home') }}">{{ admin_view.admin.name }}</a>
       {% endblock %}

@@ -1,29 +1,42 @@
+{# Template da página de listagem de equipamentos #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
+
+{# Importar macros - funções auxiliares #}
 {% import "macros.html" as macros with context %}
 
+{# Título da Página #}
 
 {% block page_title %}Equipamentos{% endblock %}
 
-
+{# Definir aba ativa #}
 {% set active_tab = 'equipamentos' %}
 
 
 {% block head %}
+  {# Parte original do template base #}
   {{ super() }}
+
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/equipamentos.css') }}">
+
+  {# Incluir CSS de extensões sendo utilizadas #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/select2/select2.css', v='3.5.2') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/select2/select2-bootstrap3.css', v='1.4.6') }}">
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='externo/daterangepicker/daterangepicker-bs3.css', v='1.3.22') }}">
 {% endblock %}
 
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="page-header">
     <h1>Equipamentos</h1>
   </div>
 
+  {# Aba superior para adição de filtros #}
+
   <ul class="nav nav-tabs">
-    <!-- Filtros -->
     {% if filtros %}
       <li class="dropdown">
         {{ macros.filter_options() }}
@@ -31,10 +44,14 @@
     {% endif %}
   </ul>
 
+  {# Local onde serão adicionados os formulários dos filtros quando são adicionados #}
+
   {% if filtros %}
     {{ macros.filter_form() }}
     <div class="clearfix"></div>
   {% endif %}
+
+  {# Tabela com a listagem de equipamentos #}
 
   <table class="table table-hover table-striped">
     <thead>
@@ -73,7 +90,8 @@
       <h4>Nenhum equipamento.</h4>
     {% endif %}
 
-  <!-- Paginação -->
+  {# Paginação #}
+
   {% if pagination %}
     <div class="pagination">
       {{ macros.pagination_widget(pagination, 'principal.equipamentos') }}
@@ -81,16 +99,22 @@
   {% endif %}
 {% endblock %}
 
+{# Inclusão de JavaScript #}
 
 {% block scripts %}
+  {# Parte original do template base #}
   {{ super() }}
+
+  {# Incluir JavaScript de extensões sendo utilizadas #}
   <script type="text/javascript" src="{{ url_for('static', filename='externo/select2/select2.min.js', v='3.5.2') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='externo/moment.min.js', v='2.9.0') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='externo/daterangepicker/daterangepicker.js', v='1.3.22') }}"></script>
 
+  {# Incluir JavaScript de formulários e filtros (Adaptados do Flask-Admin) #}
   <script type="text/javascript" src="{{ url_for('static', filename='externo/form.js') }}"></script>
   <script type="text/javascript" src="{{ url_for('static', filename='externo/filters.js') }}"></script>
 
+  {# JavaScript de identificação dos filtros disponíveis e ativos (Copiado do Flask-Admin) #}
   <script language="javascript">
       (function($) {
           $('[data-role=tooltip]').tooltip({

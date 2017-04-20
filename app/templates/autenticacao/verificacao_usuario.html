@@ -1,21 +1,31 @@
+{# Template da página de verificação de usuário pelo administrador #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
+
+{# Importar geração de formulários do bootstrap #}
 {% import "bootstrap/wtf.html" as wtf %}
 
+{# Título da Página #}
 
 {% block page_title %}Verificação de Usuário{% endblock %}
 
-
 {% block head %}
+  {# Parte original do template base #}
   {{ super() }}
+
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/autenticacao/verificacao_usuario.css') }}">
 {% endblock %}  
 
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="page-header">
     <h1>Verificação de Usuário</h1>
   </div>
   
+  {# Formulário de verificação de usuário #}
   <div class="col-md-4">
     {{ wtf.quick_form(form) }}
   </div>

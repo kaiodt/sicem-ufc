@@ -1,5 +1,9 @@
+{# Template para a view de criação de manutenção inicial do equipamento #}
+
+{# Estende o template original do Flask-Admin #}
 {% extends 'admin/master.html' %}
 
+{# Título da Página #}
 
 {% block title %}
   {{ admin_view.name }} | Administração -  SICEM-UFC
@@ -7,32 +11,48 @@
 
 
 {% block head %}
+  {# Parte original do template do Flask-Admin #}
   {{ super() }}
+
+  {# Incluir CSS comum às páginas do painel de administração #}
   {% include 'administracao/head.html' %}
 {% endblock %}
 
+{# Corpo da Página #}
 
 {% block page_body %}
+  {# Incluir cabeçalho da aplicação e barra de navegação #}
   {% include 'administracao/topo.html' %}
 
+  {# Conteúdo da Página #}
+
   {% block body %}
-  <div class="container">
-    <h2>Manutenção Inicial</h3>
+    <div class="container">
+      <h2>Manutenção Inicial</h3>
 
-    <h4>Escolha uma das opções</h3>
+      {# Escolha do tipo de manutenção inicial #}
 
-    <a class="btn btn-default" role="button" href="{{ url_for('manutencao.create_view',  id=id, tipo='inicial', url=url) }}">
-      Cadastrar Manutenção Inicial
-    </a>
-    <a class="btn btn-default" role="button" href="{{ url }}">
-      Utilizar Padrão
-    </a>
-  </div>
+      <h4>Escolha uma das opções</h3>
+
+      {# Cadastro de manutenção inicial previamente existente - redirecionamento para view de criação de manutenção, tendo alguns campos já preenchidos #}
+      <a class="btn btn-default" role="button" href="{{ url_for('manutencao.create_view',  id=id, tipo='inicial', url=url) }}">
+        Cadastrar Manutenção Inicial
+      </a>
+
+      {# Utilizar a manutenção inicial padrão criada juntamente com o equipamento #}
+      <a class="btn btn-default" role="button" href="{{ url }}">
+        Utilizar Padrão
+      </a>
+    </div>
   {% endblock %}
 {% endblock %}
 
+{# Parte Inferior da Página #}
 
 {% block tail %}
+  {# Parte original do template do Flask-Admin #}
   {{ super() }}
+
+  {# Incluir rodapé #}
   {% include 'administracao/rodape.html' %} 
 {% endblock %}

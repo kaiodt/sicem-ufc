@@ -1,24 +1,35 @@
+{# Template da página de contato #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
+
+{# Importar geração de formulários do bootstrap #}
 {% import "bootstrap/wtf.html" as wtf %}
 
+{# Título da Página #}
 
 {% block page_title %}Contato{% endblock %}
 
-
+{# Definir aba ativa #}
 {% set active_tab = 'contato' %}
 
 
 {% block head %}
+  {# Parte original do template base #}
   {{ super() }}
+
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/contato.css') }}">
 {% endblock %}  
 
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="page-header">
     <h1>Contato</h1>  
   </div>
   
+  {# Formulário para envio de email #}
   <div class="col-md-4">
     {{ wtf.quick_form(form_email) }}
   </div>

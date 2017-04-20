@@ -1,17 +1,25 @@
+{# Template da página inicial #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
 
+{# Título da Página #}
 
 {% block page_title %}Home{% endblock %}
 
+{# Definir aba ativa #}
+{% set active_tab = 'home' %}
+
 
 {% block head %}
+  {# Parte original do template base #}
   {{ super() }}
+
+  {# Incluir CSS específico desta página #}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/home.css') }}">
 {% endblock %}
 
-
-{% set active_tab = 'home' %}
-
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="jumbotron">

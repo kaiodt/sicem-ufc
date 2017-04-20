@@ -1,15 +1,23 @@
+{# Template da página de recuperação de senha #}
+
+{# Estende o template base #}
 {% extends "base.html" %}
+
+{# Importar geração de formulários do bootstrap #}
 {% import "bootstrap/wtf.html" as wtf %}
 
+{# Título da Página #}
 
 {% block page_title %}Recuperação de Senha{% endblock %}
 
+{# Conteúdo da Página #}
 
 {% block page_content %}
   <div class="page-header">
     <h1>Recuperação de Senha</h1>
   </div>
   
+  {# Formulário de recuperação de senha #}
   <div class="col-md-4">
     {{ wtf.quick_form(form) }}
   </div>
