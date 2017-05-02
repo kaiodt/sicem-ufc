@@ -88,9 +88,13 @@ ENV/
 # Rope project settings
 .ropeproject
 
+# Arquivos do MacOs
+.DS_Store
+
 # Migrações do banco de dados
 # migrations/
 
 # Outros
 configuracao_heroku.txt
-set_config
+set_config.txt
+

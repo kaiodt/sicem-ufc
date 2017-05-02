@@ -135,6 +135,11 @@ class Usuario(UserMixin, db.Model):
     # Cargo do usuário
     id_cargo = db.Column(db.Integer, db.ForeignKey('cargos.id'))
 
+    # Unidades pelas quais o usuário é responsável (parte do consumo)
+    id_unidade_responsavel = db.Column(db.Integer,
+                                       db.ForeignKey('unidadesresponsaveis.id'))
+
+
     ### Métodos ###
 
     # Inicialização
@@ -1065,4 +1070,147 @@ class Manutencao(db.Model):
         return '%d [%s %d] %s em %s' % (self.num_ordem_servico, 
             self.equipamento.tipo_equipamento, self.equipamento.tombamento,
             str_status, data.strftime("%d.%m.%Y"))
+
+########## Modelos para a parte de Consumo ##########
+
+# Unidade Responsável (Topo da Hierarquia)
+class UnidadeResponsavel(db.Model):
+    # Nome da tabela no banco de dados
+    __tablename__ = 'unidadesresponsaveis'
+
+    # Nome formatado no singular e plural (para eventual exibição)
+    nome_formatado_singular = 'Unidade Responsável'
+    nome_formatado_plural = 'Unidades Responsáveis'
+
+    # Endpoint a ser utilizado no painel de administração
+    endpoint = 'unidaderesponsavel'
+
+    ### Colunas ###
+
+    # ID na tabela
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Nome
+    nome = db.Column(db.String(64), index=True, unique=True, nullable=False)
+
+    # Relação de responsáveis pela unidade
+    responsaveis = db.relationship('Usuario', backref='responsavel_unidade',
+                                   lazy='dynamic')
+
+    # Relação de unidades consumidoras
+    unidades_consumidoras = db.relationship('UnidadeConsumidora',
+                                            backref='unidade_responsavel',
+                                            lazy='dynamic')
+
+    ### Métodos ###
+
+    # Representação no shell
+    def __repr__(self):
+        return '<Unidade Responsável: %s>' % self.nome
+
+    # Representação na interface
+    def __str__(self):
+        return self.nome
+
+
+# Unidade Consumidora
+class UnidadeConsumidora(db.Model):
+    # Nome da tabela no banco de dados
+    __tablename__ = 'unidadesconsumidoras'
+
+    # Nome formatado no singular e plural (para eventual exibição)
+    nome_formatado_singular = 'Unidade Consumidora'
+    nome_formatado_plural = 'Unidades Consumidoras'
+
+    # Endpoint a ser utilizado no painel de administração
+    endpoint = 'unidadeconsumidora'
+
+    ### Colunas ###
+
+    # ID na tabela
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Nome
+    nome = db.Column(db.String(64), index=True, unique=True, nullable=False)
+
+    # Unidade responsável pela unidade consumidora
+    id_unidade_responsavel = db.Column(db.Integer,
+                                       db.ForeignKey('unidadesresponsaveis.id'))
+
+    # Georeferenciamento (marcador no mapa)
+    localizacao = db.Column(Geometry("POINT"))
+
+    # Número do cliente
+    num_cliente = db.Column(db.Integer, unique=True, nullable=False)
+
+    # Endereço
+    endereco = db.Column(db.String(300))
+
+    # Modalidade tarifária
+    mod_tarifaria = db.Column(db.String(64), nullable=False)
+
+    # Números dos medidores
+    num_medidores = db.Column(db.Integer, unique=True, nullable=False)
+
+    # Relação de contas de energia da unidade consumidora
+    hist_contas = db.relationship('Conta', backref='unidade_consumidora',
+                                  lazy='dynamic')
+
+    ### Métodos ###
+
+    # Representação no shell
+    def __repr__(self):
+        return '<Unidade Consumidora: %s [%s]>' % \
+                (self.nome, self.unidade_responsavel.nome)
+
+    # Representação na interface
+    def __str__(self):
+        return self.nome
+
+
+# Conta de Energia
+class Conta(db.Model):
+    # Nome da tabela no banco de dados
+    __tablename__ = 'contas'
+
+    # Nome formatado no singular e plural (para eventual exibição)
+    nome_formatado_singular = 'Conta'
+    nome_formatado_plural = 'Contas'
+
+    # Endpoint a ser utilizado no painel de administração
+    endpoint = 'conta'
+
+    ### Colunas ###
+
+    # ID na tabela
+    id = db.Column(db.Integer, primary_key=True)
+
+    # Unidade consumidora
+    id_unidade_consumidora = db.Column(db.Integer,
+                                       db.ForeignKey('unidadesconsumidoras.id'))
+
+    # Data da leitura [dd.mm.aaaa]
+    data_leitura = db.Column(db.Date, index=True, nullable=False)
+
+    # Consumo fora de ponta [kWh]
+    cons_fora_ponta = db.Column(db.Integer, nullable=False)
+
+    # Consumo hora ponta [kWh]
+    cons_hora_ponta = db.Column(db.Integer, nullable=False)
+
+    # Valor [R$]
+    valor = db.Column(db.Float, nullable=False)
+
+
+    ### Métodos ###
+
+    # Representação no shell
+    def __repr__(self):
+        return '<Conta: %s [%s]>' % \
+                (self.unidade_consumidora.nome, self.data_leitura.strftime("%d.%m.%Y"))
+
+    # Representação na interface
+    def __str__(self):
+        return '%s [%s]' % \
+                (self.unidade_consumidora.nome, self.data_leitura.strftime("%d.%m.%Y"))
 
