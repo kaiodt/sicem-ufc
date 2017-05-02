@@ -351,6 +351,11 @@ def solicitacoes():
 # Página de Consumo (Em Desenvolvimento)
 @principal.route('/consumo')
 def consumo():
+    '''
+    unidades_consumidoras = UnidadeConsumidora.query.all()
+    return render_template('consumo.html', unidades=unidades_consumidoras)
+    '''
+    
     return render_template('principal/consumo.html')
 
 
