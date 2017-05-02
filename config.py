@@ -29,7 +29,7 @@ class Config:
     ADMIN_EMAIL = os.environ.get('ADMIN_EMAIL')
     ADMIN_SENHA = os.environ.get('ADMIN_SENHA')
 
-    # Gerar commits do banco de dados 
+    # Gerar commits do banco de dados ao final de cada request
     SQLALCHEMY_COMMIT_ON_TEARDOWN = True
 
     # Configuração do envio de emails do sistema
@@ -72,10 +72,11 @@ class ConfigProducao(Config):
     # Método executado quando a aplicação é criada (cls é a própria classe)
     @classmethod
     def init_app(cls, app):
-        # Executar método inicial da configuração padrão
+       # Executar método inicial da configuração padrão
         Config.init_app(app)
 
-        # Configuração do envio de emails com logs de erros para os administradores
+        # Configuração do envio de emails com logs de erros críticos para os
+        # desenvolvedores
 
         import logging
         from logging.handlers import SMTPHandler
@@ -91,17 +92,17 @@ class ConfigProducao(Config):
             if getattr(cls, 'MAIL_USE_TLS', None):
                 secure = ()
 
-        # Gerar lista de emails dos administradores
+        # Gerar lista de emails dos desenvolvedores
 
-        lista_adms = Usuario.listar_administradores()
-        emails_administradores = [usuario.email for usuario in lista_adms]
+        lista_devs = Usuario.listar_desenvolvedores()
+        emails_desenvolvedores = [usuario.email for usuario in lista_devs]
 
         # Criação do objeto que enviará os emails
 
         mail_handler = SMTPHandler(
             mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
             fromaddr=cls.MAIL_SENDER,
-            toaddrs=emails_administradores,
+            toaddrs=emails_desenvolvedores,
             subject='Erro de Sistema - SICEM-UFC',
             credentials=credentials,
             secure=secure)

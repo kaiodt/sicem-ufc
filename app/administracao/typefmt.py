@@ -22,6 +22,17 @@ from sqlalchemy import func
 # Alteração da forma como alguns tipos de dados são exibidos nas views
 # de listagem e de detalhes
 
+# Tipo float
+def formato_float(view, value):
+    # Exibir duas casas decimais e mostrar separadores de milhares
+    float_str = '{:,.2f}'.format(value)
+
+    # Substituir '.' por ',' e ',' por '.' e retornar o valor formatado
+    # Note que isso deve ser feito simultaneamente, por isso o uso 
+    # de uma variável temporária.
+    return float_str.replace(',', '%temp%').replace('.', ',').replace('%temp%', '.')
+    
+
 # Tipo Data
 def formato_data(view, value):
     # Exibição no formato dd.mm.aaa
@@ -92,7 +103,7 @@ def formato_relacao(view, context, model, name):
     return Markup(html_string)
 
 
-# Campos Tipo Relação de Ambientes
+# Campo Tipo Relação de Ambientes
 def formato_relacao_ambientes(view, context, model, name):
     html_string = ""
 
@@ -111,7 +122,7 @@ def formato_relacao_ambientes(view, context, model, name):
     return Markup(html_string)
 
 
-# Campos Tipo Relação de Equipamentos
+# Campo Tipo Relação de Equipamentos
 def formato_relacao_equipamentos(view, context, model, name):
     html_string = ""
 
@@ -130,7 +141,7 @@ def formato_relacao_equipamentos(view, context, model, name):
     return Markup(html_string)
 
 
-# Campos Tipo Relação de Manutenções
+# Campo Tipo Relação de Manutenções
 def formato_relacao_manutencoes(view, context, model, name):
     html_string = ""
 
@@ -152,12 +163,63 @@ def formato_relacao_manutencoes(view, context, model, name):
     return Markup(html_string)
 
 
+# Campo Tipo Relação de Usuários Responsáveis por uma Unidade Responsável
+def formato_relacao_responsaveis(view, context, model, name):
+    html_string = ""
+
+    # Gerar lista de botões com links de redirecionamento para cada responsável
+    for responsavel in model.__getattribute__(name).order_by('nome').all():
+        html_string += \
+            '<a class="campo_relacao" href="{url}">\
+                <span class="label label-default">{nome} [{email}]</span>\
+             </a>'.format(url=url_for('usuario.details_view', id=responsavel.id),
+                          nome=responsavel.nome,
+                          email=responsavel.email)
+
+    return Markup(html_string)
+
+
+# Campo Tipo Relação de Unidades Consumidoras
+def formato_relacao_unidades_consumidoras(view, context, model, name):
+    html_string = ""
+
+    # Gerar lista de botões com links de redirecionamento para cada unidade consumidora
+    for unidade in model.__getattribute__(name).order_by('nome').all():
+        html_string += \
+            '<a class="campo_relacao" href="{url}">\
+                <span class="label label-default">{nome}</span>\
+             </a>'.format(url=url_for('unidadeconsumidora.details_view', 
+                          id=unidade.id),
+                          nome=unidade.nome)
+
+    return Markup(html_string)
+
+
+# Campo Tipo Relação de Contas de Luz
+def formato_relacao_contas(view, context, model, name):
+    html_string = ""
+
+    # Gerar lista de botões com links de redirecionamento para cada conta de luz
+    for conta in model.__getattribute__(name).order_by('data_leitura').all():
+        html_string += \
+            '<a class="campo_relacao" href="{url}">\
+                <span class="label label-default">{data}</span>\
+             </a>'.format(url=url_for('conta.details_view', id=conta.id),
+                          data=conta.data_leitura.strftime("%d.%m.%Y"))
+
+    return Markup(html_string)
+
+
+
+
 ########## Registro dos Formatos de Tipos de Dados ##########
 
 # Alteração do dicionário que define os formatos dos tipos de dados padrão
 # para que sejam substituídos pelos formatos modificados
 
 FORMATOS_PADRAO = dict(typefmt.DEFAULT_FORMATTERS)
+FORMATOS_PADRAO[float] = formato_float
 FORMATOS_PADRAO[date] = formato_data
 FORMATOS_PADRAO[WKBElement] = formato_mapa
+
 

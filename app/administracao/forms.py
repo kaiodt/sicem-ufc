@@ -71,6 +71,7 @@ class FormCriarUsuario(FormBase):
     confirmado = BooleanField('Confirmado')
 
 
+    # Certificar que o email é diferente dos já cadastrados
     def validate_email(self, field):
         if Usuario.query.filter_by(email=field.data).first():
             raise ValidationError('Email já cadastrado.')
@@ -162,6 +163,7 @@ class FormEditarCampus(FormBase):
                                            Centro.query.order_by('nome').all())
 
 
+    # Inicialização
     def __init__(self, *args, **kwargs):
         super(FormEditarCampus, self).__init__(*args, **kwargs)
         
@@ -204,6 +206,7 @@ class FormEditarCentro(FormBase):
             query_factory=lambda: Departamento.query.order_by('nome').all())
 
 
+    # Inicialização
     def __init__(self, *args, **kwargs):
         super(FormEditarCentro, self).__init__(*args, **kwargs)
 
@@ -293,7 +296,8 @@ class FormCriarAmbienteInterno(FormBase):
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
-    area = DecimalField('Área (m²)', places=2, validators=[Optional(), NumberRange(0)])
+    area = DecimalField('Área (m²)', use_locale=True,
+                        validators=[Optional(), NumberRange(0)])
 
     populacao = IntegerField('População', validators=[Optional(), NumberRange(0)])
 
@@ -312,7 +316,8 @@ class FormEditarAmbienteInterno(FormBase):
 
     detalhe_localizacao = TextAreaField('Detalhe de Localização')
 
-    area = DecimalField('Área (m²)', places=2, validators=[Optional(), NumberRange(0)])
+    area = DecimalField('Área (m²)', use_locale=True,
+                        validators=[Optional(), NumberRange(0)])
 
     populacao = IntegerField('População', validators=[Optional(), NumberRange(0)])
 
@@ -458,8 +463,8 @@ class FormCriarExtintor(FormBase):
                                           ('Pó Químico [ABC]', 'Pó Químico [ABC]')],
                                  validators=[InputRequired()])
 
-    carga_nominal = DecimalField('Carga Nominal (kg)', places=2, 
-                                                       validators=[NumberRange(0)])
+    carga_nominal = DecimalField('Carga Nominal (kg)', use_locale=True,
+                                 validators=[NumberRange(0)])
 
     fabricante = StringField('Fabricante', validators=[Length(1, 64)])
 
@@ -496,8 +501,8 @@ class FormEditarExtintor(FormBase):
                                           ('Pó Químico [ABC]', 'Pó Químico [ABC]')],
                                  validators=[InputRequired()])
 
-    carga_nominal = DecimalField('Carga Nominal (kg)', places=2,
-                                                       validators=[NumberRange(0)])
+    carga_nominal = DecimalField('Carga Nominal (kg)', use_locale=True,
+                                 validators=[NumberRange(0)])
 
     fabricante = StringField('Fabricante', validators=[Length(1, 64)])
 
@@ -861,3 +866,219 @@ class FormEditarManutencao(FormBase):
             raise ValidationError(
                 'Este equipamento já possui manutenção inicial. Edite a exstente.')
 
+
+# Criação de Unidade Responsável
+class FormCriarUnidadeResponsavel(FormBase):
+    nome = StringField('Nome', validators=[InputRequired(),
+                                           Length(1, 64)])
+
+    responsaveis = QuerySelectMultipleField('Responsáveis',
+                                            query_factory=\
+                                                lambda: Usuario.query.all(),
+                                            validators=[InputRequired()])
+
+
+    # Certificar que o nome é diferente dos já cadastrados
+    def validate_nome(self, field):
+        if UnidadeResponsavel.query.filter_by(nome=field.data).first():
+            raise ValidationError('Unidade já cadastrada.')
+
+
+# Edição de Unidade Responsável
+class FormEditarUnidadeResponsavel(FormBase):
+    nome = StringField('Nome', validators=[InputRequired(),
+                                           Length(1, 64)])
+
+    responsaveis = QuerySelectMultipleField('Responsáveis',
+                                            query_factory=\
+                                                lambda: Usuario.query.all(),
+                                            validators=[InputRequired()])
+
+    unidades_consumidoras = QuerySelectMultipleField('Unidades Consumidoras',
+                                            query_factory=\
+                                                lambda: UnidadeConsumidora.query.all(),
+                                            allow_blank=True)
+
+
+    # Certificar que, se houve alteração no nome, o novo é diferente dos já cadastrados
+    def validate_nome(self, field):
+        if UnidadeResponsavel.query.filter_by(nome=field.data).first() and \
+                field.data != UnidadeResponsavel.query.get(request.args.get('id')).nome:
+            raise ValidationError('Unidade já cadastrada.')
+
+
+# Criação de Unidade Consumidora
+class FormCriarUnidadeConsumidora(FormBase):
+    num_cliente = IntegerField('Número do Cliente',
+                               validators=[InputRequired(),
+                                           NumberRange(0)])
+
+    nome = StringField('Nome', validators=[InputRequired(),
+                                           Length(1, 64)])
+
+    unidade_responsavel = QuerySelectField('Unidade Responsável',
+                                query_factory=lambda: 
+                                    UnidadeResponsavel.query.order_by('nome').all(),
+                                validators=[InputRequired()])
+
+    endereco = StringField('Endereço', validators=[InputRequired(),
+                                                   Length(1, 300)])
+
+    localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
+                                geometry_type='POINT',
+                                # Aumentar o mapa e centralizar em Fortaleza
+                                render_kw={'data-width':400, 'data-height':400,
+                                           'data-zoom':10,
+                                           'data-lat':-3.7911773, 'data-lng':-38.5893123})
+
+    mod_tarifaria = Select2Field('Modalidade Tarifária',
+                            choices=[('Horária Verde', 'Horária Verde'),
+                                     ('Convencional Monômia', 'Convencional Monômia')],
+                            validators=[InputRequired()])
+
+    num_medidores = IntegerField('Número dos Medidores',
+                                 validators=[InputRequired(),
+                                             NumberRange(0)])
+
+
+    # Certificar que o número de cliente ainda não existe
+    def validate_num_cliente(self, field):
+        if UnidadeConsumidora.query.filter_by(num_cliente=field.data).first():
+            raise ValidationError('Unidade já cadastrada.')
+
+
+    # Certificar que o nome é diferente dos já cadastrados
+    def validate_nome(self, field):
+        if UnidadeConsumidora.query.filter_by(nome=field.data).first():
+            raise ValidationError('Unidade já cadastrada.')
+
+
+    # Certificar que o número de cliente ainda não existe
+    def validate_num_medidores(self, field):
+        if UnidadeConsumidora.query.filter_by(num_medidores=field.data).first():
+            raise ValidationError('Número já cadastrado.')
+
+
+# Edição de Unidade Consumidora
+class FormEditarUnidadeConsumidora(FormBase):
+    num_cliente = IntegerField('Número do Cliente',
+                               validators=[InputRequired(),
+                                           NumberRange(0)])
+
+    nome = StringField('Nome', validators=[InputRequired(),
+                                           Length(1, 64)])
+
+    unidade_responsavel = QuerySelectField('Unidade Responsável',
+                                query_factory=lambda: 
+                                    UnidadeResponsavel.query.order_by('nome').all(),
+                                validators=[InputRequired()])
+
+    endereco = StringField('Endereço', validators=[InputRequired(),
+                                                   Length(1, 300)])
+
+    localizacao = GeoJSONField('Localização', srid=-1, session=db.session,
+                                geometry_type='POINT',
+                                # Aumentar o mapa e centralizar em Fortaleza
+                                render_kw={'data-width':400, 'data-height':400,
+                                           'data-zoom':10,
+                                           'data-lat':-3.7911773, 'data-lng':-38.5893123})
+
+    mod_tarifaria = Select2Field('Modalidade Tarifária',
+                            choices=[('Horária Verde', 'Horária Verde'),
+                                     ('Convencional Monômia', 'Convencional Monômia')],
+                            validators=[InputRequired()])
+
+    num_medidores = IntegerField('Número dos Medidores',
+                                 validators=[InputRequired(),
+                                             NumberRange(0)])
+
+
+    hist_contas = QuerySelectMultipleField('Histórico de Contas',
+                                            query_factory=\
+                                                lambda: Conta.query.all(),
+                                            allow_blank=True)
+
+
+    # Certificar que, se houve alteração no número de cliente, o novo é diferente dos
+    # já existentes
+    def validate_num_cliente(self, field):
+        if UnidadeConsumidora.query.filter_by(nome=field.data).first() and \
+                field.data != UnidadeConsumidora.query.get(request.args.get('id')).num_cliente:
+            raise ValidationError('Unidade já cadastrada.')
+
+
+    # Certificar que, se houve alteração no nome, o novo é diferente dos já cadastrados
+    def validate_nome(self, field):
+        if UnidadeConsumidora.query.filter_by(nome=field.data).first() and \
+                field.data != UnidadeConsumidora.query.get(request.args.get('id')).nome:
+            raise ValidationError('Unidade já cadastrada.')
+
+
+    # Certificar que, se houve alteração no número dos medidores, o novo é diferente dos
+    # já existentes
+    def validate_num_medidores(self, field):
+        if UnidadeConsumidora.query.filter_by(nome=field.data).first() and \
+                field.data != UnidadeConsumidora.query.get(request.args.get('id')).num_medidores:
+            raise ValidationError('Número já cadastrado.')
+
+
+# Criação de Conta de Energia
+class FormCriarConta(FormBase):
+    unidade_consumidora = QuerySelectField('Unidade Consumidora',
+                                query_factory=lambda: 
+                                    UnidadeConsumidora.query.order_by('nome').all(),
+                                validators=[InputRequired()])
+
+    data_leitura = DateField('Data da Leitura', widget=DatePickerWidget(),
+                             render_kw={'data-date-format': 'DD.MM.YYYY'},
+                             format='%d.%m.%Y',
+                             validators=[InputRequired()])
+
+    cons_fora_ponta = IntegerField('Consumo Fora de Ponta (kWh)',
+                                   validators=[InputRequired(),
+                                               NumberRange(0)])
+
+    cons_hora_ponta = IntegerField('Consumo Hora Ponta (kWh)',
+                                   validators=[InputRequired(),
+                                               NumberRange(0)])
+
+    valor = DecimalField('Valor (R$)', use_locale=True,
+                         validators=[InputRequired(),
+                                     NumberRange(0)])
+
+
+    # Certificar que a data da leitura não seja no futuro
+    def validate_data_leitura(self, field):
+      if field.data > date.today():
+        raise ValidationError('Não é possível cadastrar datas no futuro.')
+
+
+# Edição de Conta de Energia
+class FormEditarConta(FormBase):
+    unidade_consumidora = QuerySelectField('Unidade Consumidora',
+                                query_factory=lambda: 
+                                    UnidadeConsumidora.query.order_by('nome').all(),
+                                validators=[InputRequired()])
+
+    data_leitura = DateField('Data da Leitura', widget=DatePickerWidget(),
+                             render_kw={'data-date-format': 'DD.MM.YYYY'},
+                             format='%d.%m.%Y',
+                             validators=[InputRequired()])
+
+    cons_fora_ponta = IntegerField('Consumo Fora de Ponta (kWh)',
+                                   validators=[InputRequired(),
+                                               NumberRange(0)])
+
+    cons_hora_ponta = IntegerField('Consumo Hora Ponta (kWh)',
+                                   validators=[InputRequired(),
+                                               NumberRange(0)])
+
+    valor = DecimalField('Valor (R$)', use_locale=True,
+                         validators=[InputRequired(),
+                                     NumberRange(0)])
+
+
+    # Certificar que a data da leitura não seja no futuro
+    def validate_data_leitura(self, field):
+      if field.data > date.today():
+        raise ValidationError('Não é possível cadastrar datas no futuro.')

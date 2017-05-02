@@ -1220,7 +1220,7 @@ class ModelViewManutencao(ModelViewCadastrador):
                    'equipamento.ambiente.bloco.departamento.centro.campus.nome',
                    'status']
 
-    # Coluna padrão usada para ordenar itens
+    # Coluna padrão usada para ordenar itens (True -> ordem descrescente)
     column_default_sort = ('data_abertura', True)
 
     # Colunas que podem ser utilizadas para ordenar os itens
@@ -1441,6 +1441,133 @@ class ModelViewManutencao(ModelViewCadastrador):
                            url=request.args.get('url'))
 
 
+##### Consumo #####
+
+
+# Unidades Responsáveis
+class ModelViewUnidadeResponsavel(ModelViewCadastrador):
+    # Colunas exibidas na view de listagem (em ordem)
+    # Caso a coluna seja uma referência a outro modelo, indicar que
+    # coluna do modelo referenciado deve ser exibida usando notação de ponto
+    column_list = ['nome']
+
+    # Coluna padrão usada para ordenar itens
+    column_default_sort = 'nome'
+
+    # Colunas que podem ser utilizadas para ordenar os itens
+    column_sortable_list = ['nome']
+
+    # Colunas em que pode ser feita busca    
+    column_searchable_list = ['nome']
+    
+    # Colunas exibidas na view de detalhes (em ordem)
+    column_details_list = ['nome', 'responsaveis', 'unidades_consumidoras']
+
+    # Exibição dos nomes das colunas (necessário adicionar os acentos)
+    # Colunas referenciadas de outros modelos devem ter seus nomes corrigidos
+    column_labels = {'responsaveis': 'Responsáveis'}
+
+    # Colunas que possuem um formato modificado (arquivo 'typefmt.py')
+    column_formatters = {'responsaveis': typefmt.formato_relacao_responsaveis,
+                         'unidades_consumidoras': typefmt.formato_relacao_unidades_consumidoras}
+
+    # Definição dos formulários utilizados
+    create_form = FormCriarUnidadeResponsavel
+    edit_form = FormEditarUnidadeResponsavel
+
+
+# Unidades Consumidoras
+class ModelViewUnidadeConsumidora(ModelViewCadastrador):
+    # Colunas exibidas na view de listagem (em ordem)
+    # Caso a coluna seja uma referência a outro modelo, indicar que
+    # coluna do modelo referenciado deve ser exibida usando notação de ponto
+    column_list = ['num_cliente', 'nome', 'unidade_responsavel.nome', 'localizacao']
+
+    # Coluna padrão usada para ordenar itens
+    column_default_sort = 'nome'
+
+    # Colunas que podem ser utilizadas para ordenar os itens
+    column_sortable_list = ['nome', 'unidade_responsavel.nome']
+
+    # Colunas em que pode ser feita busca    
+    column_searchable_list = ['num_cliente', 'nome', 'unidade_responsavel.nome']
+    
+    # Colunas exibidas na view de detalhes (em ordem)
+    column_details_list = ['num_cliente', 'nome', 'unidade_responsavel.nome',
+                           'endereco', 'localizacao', 'mod_tarifaria',
+                           'num_medidores', 'hist_contas']
+
+    # Exibição dos nomes das colunas (necessário adicionar os acentos)
+    # Colunas referenciadas de outros modelos devem ter seus nomes corrigidos
+    column_labels = {'num_cliente': 'Número do Cliente',
+                     'unidade_responsavel.nome': 'Unidade Responsável',
+                     'localizacao': 'Localização',
+                     'endereco': 'Endereço',
+                     'mod_tarifaria': 'Modalidade Tarifária',
+                     'num_medidores': 'Número dos Medidores',
+                     'hist_contas': 'Histórico de Contas'}
+
+    # Colunas que possuem um formato modificado (arquivo 'typefmt.py')
+    column_formatters = dict(hist_contas=typefmt.formato_relacao_contas)
+
+    # Lista de filtros que podem ser aplicados em cada coluna
+    # Deve-se indicar a coluna e o nome de exibição do filtro
+    # Note também que alguns tipos de dados possuem mais de um filtro ('filters.py')
+
+    column_filters = FiltrosStrings(UnidadeConsumidora.nome, 'Nome')
+    column_filters.extend(FiltrosStrings(UnidadeResponsavel.nome, 'Unidade Responsável'))
+
+    # Definição dos formulários utilizados
+    create_form = FormCriarUnidadeConsumidora
+    edit_form = FormEditarUnidadeConsumidora
+
+
+# Contas de Energia
+class ModelViewConta(ModelViewCadastrador):
+    # Colunas exibidas na view de listagem (em ordem)
+    # Caso a coluna seja uma referência a outro modelo, indicar que
+    # coluna do modelo referenciado deve ser exibida usando notação de ponto
+    column_list = ['unidade_consumidora.num_cliente', 'unidade_consumidora.nome',
+                   'data_leitura', 'cons_fora_ponta', 'cons_hora_ponta', 'valor']
+
+    # Coluna padrão usada para ordenar itens
+    column_default_sort = 'unidade_consumidora.nome'
+
+    # Colunas que podem ser utilizadas para ordenar os itens
+    column_sortable_list = ['unidade_consumidora.nome', 'data_leitura',
+                            'cons_fora_ponta', 'cons_hora_ponta', 'valor']
+
+    # Colunas em que pode ser feita busca    
+    column_searchable_list = ['unidade_consumidora.num_cliente', 'unidade_consumidora.nome']
+    
+    # Colunas exibidas na view de detalhes (em ordem)
+    column_details_list = ['unidade_consumidora.num_cliente', 'unidade_consumidora.nome',
+                           'data_leitura', 'cons_fora_ponta', 'cons_hora_ponta', 'valor']
+
+    # Exibição dos nomes das colunas (necessário adicionar os acentos)
+    # Colunas referenciadas de outros modelos devem ter seus nomes corrigidos
+    column_labels = {'unidade_consumidora.num_cliente': 'Número do Cliente',
+                     'unidade_consumidora.nome': 'Unidade Consumidora',
+                     'data_leitura': 'Data da Leitura',
+                     'cons_fora_ponta': 'Consumo Fora de Ponta (kWh)',
+                     'cons_hora_ponta': 'Consumo Hora Ponta (kWh)',
+                     'valor': 'Valor (R$)'}
+
+    # Lista de filtros que podem ser aplicados em cada coluna
+    # Deve-se indicar a coluna e o nome de exibição do filtro
+    # Note também que alguns tipos de dados possuem mais de um filtro ('filters.py')
+
+    column_filters = FiltrosStrings(UnidadeConsumidora.nome, 'Nome')
+    column_filters.extend(FiltrosDatas(Conta.data_leitura, 'Data da Leitura'))
+    column_filters.extend(FiltrosFloats(Conta.cons_fora_ponta, 'Consumo Fora de Ponta'))
+    column_filters.extend(FiltrosFloats(Conta.cons_hora_ponta, 'Consumo Hora Ponta'))
+    column_filters.extend(FiltrosFloats(Conta.valor, 'Valor'))
+
+    # Definição dos formulários utilizados
+    create_form = FormCriarConta
+    edit_form = FormEditarConta
+
+
 ########## Registro das Views ##########
 
 # Para cada view, define-se o modelo, a sessão atual de interface com
@@ -1535,4 +1662,21 @@ admin.add_view(ModelViewCondicionadorAr(CondicionadorAr, db.session,
 admin.add_view(ModelViewManutencao(Manutencao, db.session,
                                    name=Manutencao.nome_formatado_plural,
                                    endpoint=Manutencao.endpoint))
+
+##### Consumo #####
+
+admin.add_view(ModelViewUnidadeResponsavel(UnidadeResponsavel, db.session,
+                                    name=UnidadeResponsavel.nome_formatado_plural,
+                                    category='Consumo',
+                                    endpoint=UnidadeResponsavel.endpoint))
+
+admin.add_view(ModelViewUnidadeConsumidora(UnidadeConsumidora, db.session,
+                                    name=UnidadeConsumidora.nome_formatado_plural,
+                                    category='Consumo',
+                                    endpoint=UnidadeConsumidora.endpoint))
+
+admin.add_view(ModelViewConta(Conta, db.session,
+                              name=Conta.nome_formatado_plural,
+                              category='Consumo',
+                              endpoint=Conta.endpoint))
 
