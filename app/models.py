@@ -1198,8 +1198,14 @@ class Conta(db.Model):
     # Consumo hora ponta [kWh]
     cons_hora_ponta = db.Column(db.Integer, nullable=False)
 
-    # Valor [R$]
-    valor = db.Column(db.Float, nullable=False)
+    # Valor faturado de fora ponta [R$]
+    valor_fora_ponta = db.Column(db.Float, nullable=False)
+
+    # Valor faturado de hora ponta [R$]
+    valor_hora_ponta = db.Column(db.Float, nullable=False)
+
+    # Valor total da conta [R$]
+    valor_total = db.Column(db.Float, nullable=False)
 
 
     ### Métodos ###

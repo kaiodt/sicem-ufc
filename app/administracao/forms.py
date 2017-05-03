@@ -874,7 +874,7 @@ class FormCriarUnidadeResponsavel(FormBase):
 
     responsaveis = QuerySelectMultipleField('Responsáveis',
                                             query_factory=\
-                                                lambda: Usuario.query.all(),
+                                                lambda: Usuario.query.filter_by(responsavel_unidade=None).all(),
                                             validators=[InputRequired()])
 
 
@@ -932,8 +932,8 @@ class FormCriarUnidadeConsumidora(FormBase):
                                            'data-lat':-3.7911773, 'data-lng':-38.5893123})
 
     mod_tarifaria = Select2Field('Modalidade Tarifária',
-                            choices=[('Horária Verde', 'Horária Verde'),
-                                     ('Convencional Monômia', 'Convencional Monômia')],
+                            choices=[('Horária Verde', 'Horária Verde')],
+                                     #('Convencional Monômia', 'Convencional Monômia')],
                             validators=[InputRequired()])
 
     num_medidores = IntegerField('Número dos Medidores',
@@ -984,8 +984,8 @@ class FormEditarUnidadeConsumidora(FormBase):
                                            'data-lat':-3.7911773, 'data-lng':-38.5893123})
 
     mod_tarifaria = Select2Field('Modalidade Tarifária',
-                            choices=[('Horária Verde', 'Horária Verde'),
-                                     ('Convencional Monômia', 'Convencional Monômia')],
+                            choices=[('Horária Verde', 'Horária Verde')],
+                                    #('Convencional Monômia', 'Convencional Monômia')],
                             validators=[InputRequired()])
 
     num_medidores = IntegerField('Número dos Medidores',
@@ -1002,7 +1002,7 @@ class FormEditarUnidadeConsumidora(FormBase):
     # Certificar que, se houve alteração no número de cliente, o novo é diferente dos
     # já existentes
     def validate_num_cliente(self, field):
-        if UnidadeConsumidora.query.filter_by(nome=field.data).first() and \
+        if UnidadeConsumidora.query.filter_by(num_cliente=field.data).first() and \
                 field.data != UnidadeConsumidora.query.get(request.args.get('id')).num_cliente:
             raise ValidationError('Unidade já cadastrada.')
 
@@ -1017,7 +1017,7 @@ class FormEditarUnidadeConsumidora(FormBase):
     # Certificar que, se houve alteração no número dos medidores, o novo é diferente dos
     # já existentes
     def validate_num_medidores(self, field):
-        if UnidadeConsumidora.query.filter_by(nome=field.data).first() and \
+        if UnidadeConsumidora.query.filter_by(num_medidores=field.data).first() and \
                 field.data != UnidadeConsumidora.query.get(request.args.get('id')).num_medidores:
             raise ValidationError('Número já cadastrado.')
 
@@ -1042,9 +1042,17 @@ class FormCriarConta(FormBase):
                                    validators=[InputRequired(),
                                                NumberRange(0)])
 
-    valor = DecimalField('Valor (R$)', use_locale=True,
-                         validators=[InputRequired(),
-                                     NumberRange(0)])
+    valor_fora_ponta = DecimalField('Valor Fora de Ponta (R$)', use_locale=True,
+                                    validators=[InputRequired(),
+                                                NumberRange(0)])
+
+    valor_hora_ponta = DecimalField('Valor Hora Ponta (R$)', use_locale=True,
+                               validators=[InputRequired(),
+                                           NumberRange(0)])
+
+    valor_total = DecimalField('Valor Total (R$)', use_locale=True,
+                               validators=[InputRequired(),
+                                           NumberRange(0)])
 
 
     # Certificar que a data da leitura não seja no futuro
@@ -1073,9 +1081,18 @@ class FormEditarConta(FormBase):
                                    validators=[InputRequired(),
                                                NumberRange(0)])
 
-    valor = DecimalField('Valor (R$)', use_locale=True,
-                         validators=[InputRequired(),
-                                     NumberRange(0)])
+    valor_fora_ponta = DecimalField('Valor Fora de Ponta (R$)', use_locale=True,
+                                    validators=[InputRequired(),
+                                                NumberRange(0)])
+
+    valor_hora_ponta = DecimalField('Valor Hora Ponta (R$)', use_locale=True,
+                                    validators=[InputRequired(),
+                                            NumberRange(0)])
+
+    valor_total = DecimalField('Valor Total (R$)', use_locale=True,
+                                validators=[InputRequired(),
+                                            NumberRange(0)])
+
 
 
     # Certificar que a data da leitura não seja no futuro

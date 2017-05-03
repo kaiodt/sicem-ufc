@@ -24,6 +24,19 @@
 	</ul>
 	<p>Na Modalidade Tarifária Horária Verde, os dias úteis são divididos em dois períodos: Horário de Ponta e Horário Fora de Ponta. O Horário de Ponta compreende 3 horas do dia (17h:30min às 20h:30min), sendo que neste horário o valor da tarifa de consumo é significativamente maior (cerca de 4 vezes) que o valor da tarifa no Horário Fora da Ponta. O objetivo dessa diferença de tarifa é estimular o deslocamento de parte da carga para os horários em que o sistema elétrico estiver menos carregado (Horário Fora de Ponta). </p>
 
+	<div class="showcase__section" id="bubble">
+	  <div class="spacer --small"></div>
+	  <div id="bubbleplots">
+	    <div class="bubbleplot" data-num="0">
+	      <div class="plot" id="plotdiv"></div>
+	      <div class="control-row">
+	        Country: <select class="countrydata">
+	        </select>
+	      </div>
+	    </div>
+	  </div>
+	</div>
+
 	<div id="historicoAnualConsumo" style="height: 300px;"></div>
 	<div id="historicoMensalConsumo" style="height: 400px;"></div>
 	<div id="hoverinfo" style="margin-left:80px;"><br><br></div>
@@ -49,6 +62,8 @@
 			conta2016.foraPonta.push(consumo2016.foraPonta[i]*tarifa2016.foraPonta[i]);
 		}
 		
+		console.log(conta2016);
+
 		var consumo2017 = {	// kWh
 			ponta: [68071, 96071, 74071],
 			foraPonta: [814203, 1036203, 878203] 

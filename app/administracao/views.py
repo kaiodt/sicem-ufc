@@ -1528,21 +1528,25 @@ class ModelViewConta(ModelViewCadastrador):
     # Caso a coluna seja uma referência a outro modelo, indicar que
     # coluna do modelo referenciado deve ser exibida usando notação de ponto
     column_list = ['unidade_consumidora.num_cliente', 'unidade_consumidora.nome',
-                   'data_leitura', 'cons_fora_ponta', 'cons_hora_ponta', 'valor']
+                   'data_leitura', 'cons_fora_ponta', 'cons_hora_ponta', 
+                   'valor_fora_ponta', 'valor_hora_ponta', 'valor_total']
 
     # Coluna padrão usada para ordenar itens
     column_default_sort = 'unidade_consumidora.nome'
 
     # Colunas que podem ser utilizadas para ordenar os itens
     column_sortable_list = ['unidade_consumidora.nome', 'data_leitura',
-                            'cons_fora_ponta', 'cons_hora_ponta', 'valor']
+                            'cons_fora_ponta', 'cons_hora_ponta', 'valor_fora_ponta', 
+                            'valor_hora_ponta', 'valor_total']
 
     # Colunas em que pode ser feita busca    
     column_searchable_list = ['unidade_consumidora.num_cliente', 'unidade_consumidora.nome']
     
     # Colunas exibidas na view de detalhes (em ordem)
     column_details_list = ['unidade_consumidora.num_cliente', 'unidade_consumidora.nome',
-                           'data_leitura', 'cons_fora_ponta', 'cons_hora_ponta', 'valor']
+                           'data_leitura', 'cons_fora_ponta', 'cons_hora_ponta', 
+                           'valor_fora_ponta', 'valor_hora_ponta', 'valor_total']
+
 
     # Exibição dos nomes das colunas (necessário adicionar os acentos)
     # Colunas referenciadas de outros modelos devem ter seus nomes corrigidos
@@ -1551,7 +1555,9 @@ class ModelViewConta(ModelViewCadastrador):
                      'data_leitura': 'Data da Leitura',
                      'cons_fora_ponta': 'Consumo Fora de Ponta (kWh)',
                      'cons_hora_ponta': 'Consumo Hora Ponta (kWh)',
-                     'valor': 'Valor (R$)'}
+                     'valor_fora_ponta': 'Valor Fora de Ponta (R$)',
+                     'valor_hora_ponta': 'Valor Hora Ponta (R$)',
+                     'valor_total': 'Valor Total (R$)'}
 
     # Lista de filtros que podem ser aplicados em cada coluna
     # Deve-se indicar a coluna e o nome de exibição do filtro
@@ -1561,7 +1567,9 @@ class ModelViewConta(ModelViewCadastrador):
     column_filters.extend(FiltrosDatas(Conta.data_leitura, 'Data da Leitura'))
     column_filters.extend(FiltrosFloats(Conta.cons_fora_ponta, 'Consumo Fora de Ponta'))
     column_filters.extend(FiltrosFloats(Conta.cons_hora_ponta, 'Consumo Hora Ponta'))
-    column_filters.extend(FiltrosFloats(Conta.valor, 'Valor'))
+    column_filters.extend(FiltrosFloats(Conta.valor_fora_ponta, 'Valor Fora de Ponta'))
+    column_filters.extend(FiltrosFloats(Conta.valor_hora_ponta, 'Valor Hora Ponta'))
+    column_filters.extend(FiltrosFloats(Conta.valor_total, 'Valor Total'))
 
     # Definição dos formulários utilizados
     create_form = FormCriarConta

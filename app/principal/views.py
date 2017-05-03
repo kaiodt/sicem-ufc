@@ -6,7 +6,7 @@
 ## Views do Blueprint Principal
 ################################################################################
 
-from datetime import date
+from datetime import date, timedelta
 from flask import render_template, redirect, url_for, request, current_app
 from flask_login import login_required
 from shapely import wkb
@@ -351,6 +351,12 @@ def solicitacoes():
 # Página de Consumo (Em Desenvolvimento)
 @principal.route('/consumo')
 def consumo():
+    unidades_responsaveis = UnidadeResponsavel.query.all()
+    dicionario = {}
+
+    #for unidade_responsavel in unidades_responsaveis:
+
+    # dicionario = 
     '''
     unidades_consumidoras = UnidadeConsumidora.query.all()
     return render_template('consumo.html', unidades=unidades_consumidoras)
