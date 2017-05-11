@@ -103,7 +103,7 @@ class ConfigProducao(Config):
         mail_handler = SMTPHandler(
             mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
             fromaddr=cls.MAIL_SENDER,
-            toaddrs=ADMIN_EMAIL, # emails_desenvolvedores
+            toaddrs=Config.ADMIN_EMAIL, # emails_desenvolvedores
             subject='Erro de Sistema - SICEM-UFC',
             credentials=credentials,
             secure=secure)
