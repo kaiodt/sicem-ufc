@@ -12,14 +12,14 @@
 
 
 {% block head %}
-  {# Parte original do template base #}
-  {{ super() }}
+    {# Parte original do template base #}
+    {{ super() }}
 
-  {# Incluir CSS específico desta página #}
-  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/mapa.css') }}">
+    {# Incluir CSS específico desta página #}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/principal/mapa.css') }}">
 
-  {# Incluir CSS da extensão Leaflet #}
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css"/>
+    {# Incluir CSS da extensão Leaflet #}
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css"/>
 {% endblock %}
 
 {# Inclusão de JavaScript #}
@@ -49,43 +49,51 @@
     }).addTo(mapa_equip);
 
 
-    var cores = ["#2ecc71","#f1c40f", "#7c1191", "#e07f7f","#60e0da","#d35400"]; // cores para os polígonos
+    // cores para as áreas, ou polígonos
+    var cores = ["#2ecc71","#f1c40f", "#7c1191", "#e07f7f","#60e0da","#d35400"];
     
-
     // Inserção de todos os campi no mapa
+    var lista_campi = {{ lista_campi|tojson }};
     var campi = Array();
     var count_cor = 0;
-    {% for campus in lista_campi %}
-      {% for area in campus["mapeamento"] %}
-        campi.push(L.polygon({{ area }}, {color: cores[count_cor%cores.length]}).bindPopup("\
-          <b>{{ campus['objeto_campus'].nome }}</b>\
-          <br>{{ campus['objeto_campus'].instituicao.nome }}"));
-      {% endfor %}
-      count_cor += 1;
-    {% endfor %}
+    for(var i = 0; i < lista_campi.length; i++) { // para cada campus
+        for(var j = 0; j < lista_campi[i]["mapeamento"].length; j++) { // para cada polígono, do multipolígono que é o campus
+            campi.push(L.polygon(lista_campi[i]["mapeamento"][j], {color: cores[count_cor%cores.length]}).bindPopup("\
+                <b>"+lista_campi[i]["nome"]+"</b>\
+                <br>"+lista_campi[i]["instituicao"]));    
+
+        }
+        count_cor++; // mudando de cor
+    }
     var campi_layer = L.layerGroup(campi);
 
 
     // Inserção de todos os centros no mapa
+    var lista_centros = {{ lista_centros|tojson }};
     var centros = Array();
     count_cor = 0;
-    {% for centro in lista_centros %}
-      {% for area in centro["mapeamento"] %}
-        centros.push(L.polygon({{ area }}, {color: cores[(count_cor+3)%cores.length]}).bindPopup("\
-          <b>{{ centro['objeto_centro'].nome }}</b>\
-          <br>{{ centro['objeto_centro'].campus.nome }}<br>\
-          <br><b>Departamentos:</b>\
-          {% for departamento in centro['lista_departamentos'] %}\
-                    <br>{{ departamento.nome }}\
-                  {% endfor %}"));
-      {% endfor %}
-      count_cor += 1;
-    {% endfor %}
+    for(var i = 0; i < lista_centros.length; i++) { // para cada centro
+        // Criando o html para a lista de departamentos
+        var departamentos = ''
+        for(var k = 0; k < lista_centros[i]["lista_departamentos"].length; k++) {
+            departamentos += "<br>"+lista_centros[i]["lista_departamentos"][k]
+        }
+        
+        // Para cada polígono do multipolígono (no caso a região de um centro) será desenhado a região com a mesma cor
+        // e o mesmo pop-up
+        for(var j = 0; j < lista_centros[i]["mapeamento"].length; j++) { // para cada polígono, do multipolígono que é o centro
+            centros.push(L.polygon(lista_centros[i]["mapeamento"][j], {color: cores[(count_cor+3)%cores.length]}).bindPopup("\
+                <b>"+lista_centros[i]["nome"]+"</b>\
+                <br>"+lista_centros[i]["campus"]+"<br>\
+                <br><b>Departamentos:</b>" + departamentos));
+        }
+        count_cor++; // mudando de cor
+    }
+    
     var centros_layer = L.layerGroup(centros);
 
 
     // Criando marcadores de diferentes cores
-
     var marcador_azulmarinho = new L.Icon({
         iconUrl: "{{ url_for('static', filename='images/icones_mapa/marcador_azulmarinho.png') }}",
         iconSize: [30, 42],
@@ -105,48 +113,64 @@
       });
 
     
-    // Inserção de todos os blocos no mapa
+    // Inserção de todas as Unidades Consumidoras no mapa
+    var lista_unidades_consumidoras = {{ lista_unidades_consumidoras|tojson }};
+    var unidades_consumidoras = Array();
+    for(var i = 0; i < lista_unidades_consumidoras.length; i++){
+        unidades_consumidoras.push(L.marker(lista_unidades_consumidoras[i]["localizacao"], {icon: marcador_verde}).bindPopup("\
+            <b>"+lista_unidades_consumidoras[i]["nome"]+"</b>\
+            <br>Responsável: "+lista_unidades_consumidoras[i]["unidade_responsavel"]+"\
+            <br>Tarifa: "+lista_unidades_consumidoras[i]["mod_tarifaria"]+"\
+            <br><a href='"+lista_unidades_consumidoras[i]["linkConsumo"]+"'>Visualizar consumo</a>"));
+    }
+    var unidades_consumidoras_layer = L.layerGroup(unidades_consumidoras);
+
+
+    // Inserção de todos os Blocos no mapa
+    var lista_blocos = {{ lista_blocos|tojson }};
     var blocos = Array();
-    {% for bloco in lista_blocos %}
-      blocos.push(L.marker({{ bloco["localizacao"] }}, {icon: marcador_azulmarinho}).bindPopup("\
-        <b>{{ bloco['objeto_bloco'].nome }}</b> \
-        <br>{{ bloco['objeto_bloco'].departamento.nome }}\
-        <br>{{ bloco['objeto_bloco'].departamento.centro.nome }}\
-        <br>{{ bloco['objeto_bloco'].departamento.centro.campus.nome }}\
-        <br><a href='{{ url_for('principal.equipamentos_bloco', id=bloco['objeto_bloco'].id) }}'>Visualizar equipamentos</a>\
-        "));
-    {% endfor %}
+    for(var i = 0; i < lista_blocos.length; i++) {
+        blocos.push(L.marker(lista_blocos[i]["localizacao"], {icon: marcador_azulmarinho}).bindPopup("\
+            <b>"+lista_blocos[i].nome+"</b> \
+            <br>"+lista_blocos[i].departamento+"\
+            <br>"+lista_blocos[i].centro+"\
+            <br>"+lista_blocos[i].campus+"\
+            <br><a href='"+lista_blocos[i]["linkEquipamentos"]+"'>Visualizar equipamentos</a>"));
+    }
     var blocos_layer = L.layerGroup(blocos);
 
 
     // Inserção de todas as subestações abrigadas no mapa
+    var lista_subestacoes_abrigadas = {{ lista_subestacoes_abrigadas|tojson }};
     var subestacoes_abrigadas = Array();
-    {% for subestacao_abrigada in lista_subestacoes_abrigadas %}
-      subestacoes_abrigadas.push(L.marker({{ subestacao_abrigada["localizacao"] }}, {icon: marcador_verde}).bindPopup("\
-        <b>{{ subestacao_abrigada['objeto_subestacao_abrigada'].nome }}</b>\
-        <br>Subestação Abrigada"));
-    {% endfor %}
+    for(var i = 0; i < lista_subestacoes_abrigadas.length; i++){
+        subestacoes_abrigadas.push(L.marker(lista_subestacoes_abrigadas[i]["localizacao"], {icon: marcador_verde}).bindPopup("\
+            <b>"+lista_subestacoes_abrigadas[i]["nome"]+"</b>\
+            <br>Subestação Abrigada"));
+    }
     var subestacoes_abrigadas_layer = L.layerGroup(subestacoes_abrigadas);
 
 
     // Inserção de todas as subestações aéreas no mapa
-    var subestacoes_aereas = Array()
-    {% for subestacao_aerea in lista_subestacoes_aereas %}
-      subestacoes_aereas.push(L.marker({{ subestacao_aerea["localizacao"] }}, {icon: marcador_verde}).bindPopup("\
-        <b>{{ subestacao_aerea['objeto_subestacao_aerea'].nome }}</b>\
-        <br>Subestação Aérea"));
-    {% endfor %}
+    var lista_subestacoes_aereas = {{ lista_subestacoes_aereas|tojson }};
+    var subestacoes_aereas = Array();
+    for(var i = 0; i < lista_subestacoes_aereas.length; i++) {
+        subestacoes_aereas.push(L.marker(lista_subestacoes_aereas[i]["localizacao"], {icon: marcador_verde}).bindPopup("\
+            <b>"+lista_subestacoes_aereas[i]["nome"]+"</b>\
+            <br>Subestação Aérea"));
+    }
     var subestacoes_aereas_layer = L.layerGroup(subestacoes_aereas);
     
     
     // Filtros do mapa
     var overlayMaps = {
-      "Campi": campi_layer,
-      "Centros": centros_layer,
-      "Blocos": blocos_layer,
-      "Subestações Abrigadas": subestacoes_abrigadas_layer,
-      "Subestações Aéreas": subestacoes_aereas_layer
-      };
+        "Campi": campi_layer,
+        "Centros": centros_layer,
+        "Blocos": blocos_layer,
+        "Subestações Abrigadas": subestacoes_abrigadas_layer,
+        "Subestações Aéreas": subestacoes_aereas_layer,
+        "Unidades Consumidoras": unidades_consumidoras_layer
+    };
     
     L.control.layers(null, overlayMaps).addTo(mapa_equip);
 

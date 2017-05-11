@@ -73,7 +73,7 @@ class Cargo(db.Model):
         # Definição dos cargos e suas permissões
         cargos = {
             u'Usuário': (Permissao.VISUALIZAR, True),
-            u'Cadastrador': (Permissao.CADASTRAR, False),
+            u'Cadastrador': (Permissao.CADASTRAR | Permissao.VISUALIZAR, False),
             u'Desenvolvedor': (Permissao.ADMINISTRAR, False),
             u'Administrador': (Permissao.ADMINISTRAR, False)
         }

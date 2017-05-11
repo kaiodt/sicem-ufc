@@ -6,10 +6,11 @@
 ## Views do Blueprint Principal
 ################################################################################
 
-from datetime import date, timedelta
+from datetime import date
 from flask import render_template, redirect, url_for, request, current_app
 from flask_login import login_required
 from shapely import wkb
+from sqlalchemy import extract
 
 from . import principal
 from .filters import *
@@ -30,12 +31,14 @@ def home():
 # Página do Mapa
 @principal.route('/mapa')
 def mapa():
-    # Pegando do banco de dados todos os elementos que serão inseridos no mapa
-    blocos = Bloco.query.all()
-    subestacoes_abrigadas = SubestacaoAbrigada.query.all()
-    subestacoes_aereas = SubestacaoAerea.query.all()
-    centros = Centro.query.all()
-    campi = Campus.query.all()
+    # Pegando do banco de dados todos os elementos que serão inseridos no mapa,
+    # ou seja, todos elementos com 'localizacao' definida
+    unidades_consumidoras = UnidadeConsumidora.query.filter(UnidadeConsumidora.localizacao != None).all()
+    blocos = Bloco.query.filter(Bloco.localizacao != None).all()
+    subestacoes_abrigadas = SubestacaoAbrigada.query.filter(SubestacaoAbrigada.localizacao != None).all()
+    subestacoes_aereas = SubestacaoAerea.query.filter(SubestacaoAerea.localizacao != None).all()
+    centros = Centro.query.filter(Centro.mapeamento != None).all()
+    campi = Campus.query.filter(Campus.mapeamento != None).all()
     
     # Listas que conterão dicionários com o par objeto e localização (convertida para números de lat. e long. 
     # que podem ser processados pela extensão Leaflet)
@@ -44,63 +47,80 @@ def mapa():
     lista_subestacoes_aereas = []    
     lista_centros = []
     lista_campi = []
+    lista_unidades_consumidoras = []
+
+    # Função para converter a localização salva em WKB para uma lista [latitude, longitude]
+    def wkb_to_latLong(localizacao):
+        temp = wkb.loads(bytes(localizacao.data))
+        return [temp.y, temp.x]
+
 
     # Processos iterativos que geram essas listas de dicionários
+    for unidade_consumidora in unidades_consumidoras:
+        lista_unidades_consumidoras.append({
+             "nome":               unidade_consumidora.nome
+            ,"localizacao":        wkb_to_latLong(unidade_consumidora.localizacao)
+            ,"unidadeResponsavel": unidade_consumidora.unidade_responsavel.nome
+            ,"mod_tarifaria":      unidade_consumidora.mod_tarifaria
+            ,"linkConsumo":        url_for('principal.consumo', id=unidade_consumidora.id)
+            })
+
     for bloco in blocos:
-        if bloco.localizacao is not None:    # se o bloco tiver uma localização registrada ele será adicionado 
-                                             # à lista de exibição do mapa
-            point_temp = wkb.loads(bytes(bloco.localizacao.data))
-            localizacao_temp = [point_temp.y, point_temp.x]
-            lista_blocos.append({"objeto_bloco": bloco,
-                                 "localizacao":  localizacao_temp
-                })
+        lista_blocos.append({
+             "nome":             bloco.nome
+            ,"localizacao":      wkb_to_latLong(bloco.localizacao)
+            ,"departamento":     bloco.departamento.nome
+            ,"centro":           bloco.departamento.centro.nome
+            ,"campus":           bloco.departamento.centro.campus.nome
+            ,"linkEquipamentos": url_for('principal.equipamentos_bloco', id=bloco.id)
+            })
 
     for subestacao_abrigada in subestacoes_abrigadas:
-        if subestacao_abrigada.localizacao is not None:
-            point_temp = wkb.loads(bytes(subestacao_abrigada.localizacao.data))
-            localizacao_temp = [point_temp.y, point_temp.x]
-            lista_subestacoes_abrigadas.append({"objeto_subestacao_abrigada":    subestacao_abrigada,
-                                                "localizacao":                   localizacao_temp,
-                })
+        lista_subestacoes_abrigadas.append({
+             "nome":        subestacao_abrigada.nome
+            ,"localizacao": wkb_to_latLong(subestacao_abrigada.localizacao)
+            })
 
     for subestacao_aerea in subestacoes_aereas:
-        if subestacao_aerea.localizacao is not None:
-            point_temp = wkb.loads(bytes(subestacao_aerea.localizacao.data))
-            localizacao_temp = [point_temp.y, point_temp.x]
-            lista_subestacoes_aereas.append({"objeto_subestacao_aerea":    subestacao_aerea,
-                                             "localizacao":                localizacao_temp
-                })
+        lista_subestacoes_aereas.append({
+             "nome":        subestacao_aerea.nome
+            ,"localizacao": wkb_to_latLong(subestacao_aerea.localizacao)
+            })
 
     # Como Centros e Campus possuem um mapeamento de multi-polígonos o processo iterativo é mais complexo
     for centro in centros:
-        if centro.mapeamento is not None:
-            map_temp = wkb.loads(bytes(centro.mapeamento.data)) # convertendo de um WKBElement para formato da biblioteca shapely
-            mapeamento = []
-            for area in list(map_temp):    # list(map_temp) retorna uma lista com os vários polygonos (ou áreas) do centro
-                                           # formato de um polígono: lista de tuples contendo dois elementos cada (latitude 
-                                           # e longitude). Ex: Um triângulo é [(0, 0),(0, 1),(1, 0)]
-                # trocar (x,y) => (y,x)
-                coordenadas_temp = []
-                for ponto in list(area.exterior.coords):
-                    coordenadas_temp.append([ponto[1], ponto[0]])
-                mapeamento.append(coordenadas_temp)    # mapeamento é uma lista de áreas
-                lista_centros.append({"objeto_centro":          centro,
-                                      "mapeamento":             mapeamento,
-                                      "lista_departamentos":    centro.departamentos.all()
+        centroMapData = wkb.loads(bytes(centro.mapeamento.data)) # convertendo de um WKBElement para formato da biblioteca shapely
+        mapeamento = []
+        for area in list(centroMapData): # list(centroMapData) retorna uma lista com os vários polygonos (ou áreas) do centro
+                                         # formato de um polígono: lista de tuples contendo dois elementos cada (latitude 
+                                         # e longitude). Ex: Um triângulo é [(0, 0),(0, 1),(1, 0)]
+            # trocar (x,y) => (y,x)
+            coordenadas_temp = []
+            for ponto in list(area.exterior.coords):
+                coordenadas_temp.append([ponto[1], ponto[0]])
+            mapeamento.append(coordenadas_temp)    # mapeamento é uma lista de áreas
+            
+            lista_departamentos = [departamento.nome for departamento in centro.departamentos.all()]
+            lista_centros.append({
+                 "nome":                centro.nome
+                ,"mapeamento":          mapeamento
+                ,"campus":              centro.campus.nome
+                ,"lista_departamentos": lista_departamentos
                 })
 
     for campus in campi:
-        if campus.mapeamento is not None:
-            map_temp = wkb.loads(bytes(campus.mapeamento.data))
-            mapeamento = []
-            for area in list(map_temp):
-                coordenadas_temp = []
-                for ponto in list(area.exterior.coords):
-                    coordenadas_temp.append([ponto[1], ponto[0]])
-                mapeamento.append(coordenadas_temp)
-                lista_campi.append({"objeto_campus":        campus,
-                                    "mapeamento":           mapeamento
-                })
+        map_temp = wkb.loads(bytes(campus.mapeamento.data))
+        mapeamento = []
+        for area in list(map_temp):
+            coordenadas_temp = []
+            for ponto in list(area.exterior.coords):
+                coordenadas_temp.append([ponto[1], ponto[0]])
+            mapeamento.append(coordenadas_temp)
+            lista_campi.append({
+                 "nome":        campus.nome
+                ,"mapeamento":  mapeamento
+                ,"instituicao": campus.instituicao.nome
+            })
 
 
     return render_template('principal/mapa.html', 
@@ -108,7 +128,8 @@ def mapa():
                             lista_subestacoes_abrigadas = lista_subestacoes_abrigadas,
                             lista_subestacoes_aereas = lista_subestacoes_aereas,
                             lista_centros = lista_centros,
-                            lista_campi = lista_campi)
+                            lista_campi = lista_campi,
+                            lista_unidades_consumidoras = lista_unidades_consumidoras)
 
 
 # Página de Equipamentos de um Bloco (Restrita a usuários cadastrados)
@@ -348,21 +369,64 @@ def solicitacoes():
     return render_template('principal/solicitacoes.html')
 
 
-# Página de Consumo (Em Desenvolvimento)
+# Página de Consumo
 @principal.route('/consumo')
 def consumo():
+    id_unidade_consumidora = request.args.get('id') # id da Unidade Consumidora caso exista query string
+    unidade_consumidora_inicial = ''
+    if id_unidade_consumidora is not None:
+        unidade_consumidora_inicial = UnidadeConsumidora.query.filter_by(id = id_unidade_consumidora).first()
+
     unidades_responsaveis = UnidadeResponsavel.query.all()
-    dicionario = {}
+    '''
+    O dicionário abaixo conterá a relação de Unidades Responsáveis com Unidades Consumidoras da seguinte forma:
+    cada nome de Unidade Responsável é uma key do dicionário cujo valor é uma lista com cada elemento sendo o nome de uma
+    Unidade Consumidora relacionada
+    '''
+    dicionario = {}    
+    dicionario["Todas"] = []
+    for unidade_responsavel in unidades_responsaveis:
+        # criando uma lista vazia para uma key com o nome da Unidade Responsável
+        dicionario[unidade_responsavel.nome] = [] 
+        # é feito então um query do db com todas as Unidades Consumidoras da Unidade responsável em questão
+        unidades_consumidoras = unidade_responsavel.unidades_consumidoras.all()
 
-    #for unidade_responsavel in unidades_responsaveis:
+        for unidade_consumidora in unidades_consumidoras:
+            dicionario[unidade_responsavel.nome].append(unidade_consumidora.nome) # é adicionado ao final da lista o nome da nova Unidade Consumidora
+            dicionario["Todas"].append(unidade_consumidora.nome)                  # esse nome é igualmente adicionado à lista contendo todas as Unidades Consumidoras
 
-    # dicionario = 
+    # Organizando em ordem alfabética a lista com todas as unidades consumidoras
+    dicionario["Todas"] = sorted(dicionario["Todas"])
+    
+    '''
+    No código a seguir o será construído o dicionário 'contas_5anos' contendo todas as Contas de energia de todas as Unidades Consumidoras
+    dos últimos 5 anos. Cada key de contas_5anos será o nome de uma Unidade Consumidora e seu valor será um novo dicionário cujas keys serão
+    propriedades das Contas de energia (como data, consumo fora de ponta etc) com valores no formato de listas (visando a fácil integração
+    com a biblioteca plotly.js do lado do cliente)
     '''
     unidades_consumidoras = UnidadeConsumidora.query.all()
-    return render_template('consumo.html', unidades=unidades_consumidoras)
-    '''
-    
-    return render_template('principal/consumo.html')
+    contas_5anos = {}
+
+    for unidade_consumidora in unidades_consumidoras:
+        contas_5anos[unidade_consumidora.nome] = {
+             'data': []
+            ,'consumoPonta': []
+            ,'consumoForaPonta': []
+            ,'valorPonta': []
+            ,'valorForaPonta': []
+        }
+        # Query secreto para pegar as contas dos últimos 5 anos, organizados de acordo com a coluna 'data_leitura' da tabela do db
+        contas = unidade_consumidora.hist_contas.filter(extract('year', Conta.data_leitura) > date.today().year-5).order_by(Conta.data_leitura).all()
+
+        for conta in contas:
+            contas_5anos[unidade_consumidora.nome]['data'].append("%d-%d" %(conta.data_leitura.year, conta.data_leitura.month)) # Formato para a biblioteca plotly.js
+            contas_5anos[unidade_consumidora.nome]['consumoPonta'].append(conta.cons_hora_ponta)
+            contas_5anos[unidade_consumidora.nome]['consumoForaPonta'].append(conta.cons_fora_ponta)
+            contas_5anos[unidade_consumidora.nome]['valorPonta'].append(conta.valor_hora_ponta)
+            contas_5anos[unidade_consumidora.nome]['valorForaPonta'].append(conta.valor_fora_ponta)
+          
+    return render_template('principal/consumo.html', dicionario=dicionario, contas_5anos=contas_5anos,
+                                                     unidade_consumidora_inicial=unidade_consumidora_inicial)
 
 
 # Página de Contato

@@ -23,197 +23,236 @@
 		<li>Modalidade Tarifária Convencional Monômia: caracterizada por tarifas de consumo de energia elétrica, independentemente das horas de utilização do dia.</li>
 	</ul>
 	<p>Na Modalidade Tarifária Horária Verde, os dias úteis são divididos em dois períodos: Horário de Ponta e Horário Fora de Ponta. O Horário de Ponta compreende 3 horas do dia (17h:30min às 20h:30min), sendo que neste horário o valor da tarifa de consumo é significativamente maior (cerca de 4 vezes) que o valor da tarifa no Horário Fora da Ponta. O objetivo dessa diferença de tarifa é estimular o deslocamento de parte da carga para os horários em que o sistema elétrico estiver menos carregado (Horário Fora de Ponta). </p>
+	<br>
+	
+    <div class="bubbleplot" data-num="0">
+    	<h4>
+  		<span><b>Unidade Responsável:</b> <select class="unidRes"></select></span> &nbsp &nbsp &nbsp &nbsp 
+      	<span><b>Unidade Consumidora:</b> <select class="unidCons"></select></span> &nbsp &nbsp &nbsp &nbsp 
+      	<span><b>Consumo em:</b> 
+      		<select class="tipoConsumo">
+	      		<option value="kWh">kWh</option>
+				<option value="R$">R$</option>
+      		</select>
+  		</span>
+      	</h4>
+    </div>	
 
-	<div class="showcase__section" id="bubble">
-	  <div class="spacer --small"></div>
-	  <div id="bubbleplots">
-	    <div class="bubbleplot" data-num="0">
-	      <div class="plot" id="plotdiv"></div>
-	      <div class="control-row">
-	        Country: <select class="countrydata">
-	        </select>
-	      </div>
-	    </div>
-	  </div>
-	</div>
-
+		
 	<div id="historicoAnualConsumo" style="height: 300px;"></div>
 	<div id="historicoMensalConsumo" style="height: 400px;"></div>
-	<div id="hoverinfo" style="margin-left:80px;"><br><br></div>
+	<div id="hoverinfo" class=""><br><br></div>
 	
 	<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 	<script type="text/javascript">
-		var meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun", "Jul", "Ago", "Set", "Out", "Nov", "Dez"];
-		var consumo2016 =  {// kWh
-			ponta: [77071, 95071, 88071, 103071, 118071, 119071, 119071, 92071, 112071, 112071, 116071, 106071],
-			foraPonta: [915203, 999203, 1074203, 1098203, 1262203, 1229203, 1189203, 1068203, 1190203, 1200203, 1238203, 1263203]
-		};
-		var tarifa2016 = {// R$/kWh
-			ponta: [1.55266, 1.53633, 1.48947, 1.51480, 1.59082, 1.68935, 1.67042, 1.62723, 1.67338, 1.71156, 1.6974, 1.71416],
-			foraPonta: [0.4527, 0.41851, 0.38843, 0.37868, 0.38407, 0.40789, 0.40332, 0.39289, 0.40403, 0.41325, 0.41498, 0.42423]
-		};
-		
-		var conta2016 = {	// R$
-			ponta: [],
-			foraPonta: []
-		};
-		for(var i = 0; i < 12; i++) {
-			conta2016.ponta.push(consumo2016.ponta[i]*tarifa2016.ponta[i]);
-			conta2016.foraPonta.push(consumo2016.foraPonta[i]*tarifa2016.foraPonta[i]);
-		}
-		
-		console.log(conta2016);
+		// Informações enviadas pelo servidor
+		var dicionario = {{ dicionario|tojson }};
+		var contas_5anos = {{ contas_5anos|tojson }};
+		var unidade_consumidora_inicial = "{{ unidade_consumidora_inicial }}";
 
-		var consumo2017 = {	// kWh
-			ponta: [68071, 96071, 74071],
-			foraPonta: [814203, 1036203, 878203] 
-		};
-		var tarifa2017 = { // R$/kWh
-			ponta: [1.70153, 1.70051, 1.72301],
-			foraPonta: [0.41083, 0.41058, 0.42393]
-		};
-		var conta2017 = {	//R$
-			ponta: [],
-			foraPonta: []
-		};
-		for(var i = 0; i < consumo2017.ponta.length; i++) {
-			conta2017.ponta.push(consumo2017.ponta[i]*tarifa2017.ponta[i]);
-			conta2017.foraPonta.push(consumo2017.foraPonta[i]*tarifa2017.foraPonta[i]);
-		}
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Criando variáveis para representar os elementos do HTML
+		var historicoAnual = document.getElementById('historicoAnualConsumo');
+		var historicaMensal = document.getElementById('historicoMensalConsumo');
+		var innerContainer = document.querySelector('[data-num="0"');
+		var seletorUnidRes = innerContainer.querySelector('.unidRes');
+		var seletorUnidCons = innerContainer.querySelector('.unidCons');
+		var seletorTipoConsumo = innerContainer.querySelector('.tipoConsumo');
 
-		var consumoTotal2015 = 0;
-		var consumoTotal2016 = 0;
-		for(var i = 0; i < consumo2016.ponta.length; i++) {
-			consumoTotal2016 += consumo2016.ponta[i] + consumo2016.foraPonta[i];
-		}
-		var consumoTotal2017 = 0;
-		for(var i = 0; i < consumo2017.ponta.length; i++) {
-			consumoTotal2017 += consumo2017.ponta[i] + consumo2017.foraPonta[i];
-		}
-
-		var param = consumoTotal2016;
-
-		var data = [{
-		  type: 'bar',
-		  x: [(consumoTotal2017/param), (consumoTotal2016/param), 0.9352],
-		  y: ['Ano 2017', 'Ano 2016', 'Ano 2015'],
-		  orientation: 'h'
-		}];
-
-		var layout = {
-		    title: 'Histórico anual do consumo de energia elétrica',
-		    xaxis: {
-				title: 'Consumo parametrizado pelo ano anterior',
-				tickformat: ',.2%',
-				fixedrange: true
-			},
-			yaxis: {
-				fixedrange: true
+		// Adicionando opções de Unidades responsáveis e colocando a primeira opção como "Todas"
+		var opcaoAtual = document.createElement('option');
+		opcaoAtual.text = "Todas";
+		seletorUnidRes.appendChild(opcaoAtual);
+		for(var key in dicionario) {
+			if(dicionario.hasOwnProperty(key) && key !== "Todas") { // Se o dicionário possuir realmente a key e não for "Todas"
+				var opcaoAtual = document.createElement('option');
+				opcaoAtual.text = key;
+				seletorUnidRes.appendChild(opcaoAtual);			
 			}
-		};
-
-		Plotly.newPlot('historicoAnualConsumo', data, layout);
-
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-		//////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		var consumoForaPonta = {
-		  x: meses,
-		  y: consumo2016.foraPonta,
-		  name: 'Fora de ponta',
-		  type: 'bar',
-		  visible: true
-		};
-		var consumoPonta = {
-		  x: meses,
-		  y: consumo2016.ponta,
-		  name: 'Ponta',
-		  type: 'bar',
-		  visible: true
-		};
-		var contaForaPonta = {
-			x: meses,
-			y: conta2016.foraPonta,
-			name: 'Fora de ponta',
-			type: 'bar',
-			visible: false
-		};
-		var contaPonta = {
-			x: meses,
-			y: conta2016.ponta,
-			name: 'Ponta',
-			type: 'bar',
-			visible: false
-		};
+		}
 
 		
-		var layout = {
-		    title: 'Histórico mensal do consumo de energia elétrica',
-		    xaxis: {
-				title: 'Meses do ano'
-			},
-			yaxis: {
-				title: 'Consumo',
-				fixedrange: true
-			},
-			barmode: 'stack',
-		    updatemenus: [/*{
-		        y: 0.8,
-		        yanchor: 'top',
-		        buttons: [{
-		            method: 'restyle',
-		            args: ['line.color', 'red'],
-		            label: 'red'
-		        }, {
-		            method: 'restyle',
-		            args: ['line.color', 'blue'],
-		            label: 'blue'
-		        }, {
-		            method: 'restyle',
-		            args: ['line.color', 'green'],
-		            label: 'green'
-		        }]
-		    }, */{
-		        y: 1,
-		        yanchor: 'top',
-		        buttons: [{
-		            method: 'restyle',
-		            args: [{visible: [true, true, false, false]}],
-		            label: 'Consumo em kWh'
-		        }, /*{
-		        	method: 'relayout',
-		            args: [{'yaxis.title': 'kWh'}],
-		            label: 'kWh'
-		        }, */{
-		            method: 'restyle',
-		            args: ['visible', [false, false, true, true]],
-		            label: 'Consumo em R$'
-		        }]
-		    }],
-		};
-
+		// Já adicionando as opções de Unidades Consumidoras para a Unidade Responsável selecionada quando a página é carregada
+		// (atualmente "Todas")
+		atualizarUnidadeConsumidora();
 		
-		Plotly.plot('historicoMensalConsumo', [consumoForaPonta, consumoPonta, contaForaPonta, contaPonta], layout);
+		// se houver unidade consumidora inicial
+		if(unidade_consumidora_inicial !== "") { seletorUnidCons.value = unidade_consumidora_inicial; }
 
-		var myPlot = document.getElementById('historicoMensalConsumo');
-		var hoverInfo = document.getElementById('hoverinfo');
+		// Já desenhando os gráficos
+		atualizarGraficos();
 
-		myPlot.on('plotly_hover', function(data){
-		    var total = data.points[0].y + data.points[1].y;
-		    var infotext = data.points[0].data.name + ': ' + (data.points[0].y/total*100).toFixed(2) + '%' + '<br>'
-		    			 + data.points[1].data.name + ': ' + (data.points[1].y/total*100).toFixed(2) + '%';
-		    
-		    hoverInfo.innerHTML = infotext;
-		})
-		 .on('plotly_unhover', function(data){
-		    hoverInfo.innerHTML = '<br><br>';
-		});
+		// Adicionando evento no caso da mudança de Unidade Responsável
+		seletorUnidRes.addEventListener('change', atualizarUnidadeConsumidora, false);
+		// Adicionando evento caso haja mudança na Unidade Consumidora selecionada
+		seletorUnidCons.addEventListener('change', atualizarGraficos, false);
+		// Adicionando um evento para caso haja mudança na unidade de medida do consumo
+		seletorTipoConsumo.addEventListener('change', atualizarGraficos, false);
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		function atualizarUnidadeConsumidora() {
+			// Limpando as Unidades Consumidoras antigas:
+			while(seletorUnidCons.firstChild) {
+				seletorUnidCons.removeChild(seletorUnidCons.firstChild);
+			}
+
+			// Inserindo Unidades Consumidoras novas baseado na Unidade Responsável selecionada
+			var key = seletorUnidRes.value;
+			for(var i = 0; i < dicionario[key].length; i++) {
+				var opcaoAtual = document.createElement('option');
+				opcaoAtual.text = dicionario[key][i];
+				seletorUnidCons.appendChild(opcaoAtual);
+			}
+
+			// Garantindo que os gráficos da página sempre serão da Unidade Consumidora selecionada
+			atualizarGraficos();
+		}
+
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		function atualizarGraficos() {
+			var unidCons = seletorUnidCons.value;		// Unidade Consumidora selecionada
+			var unidade = seletorTipoConsumo.value;	// Unidade de medida do consumo selecionada
+
+			if(unidCons === '') { // Se a Unidade Responsável selecionada não tiver nenhuma Unidade Consumidora
+				historicoAnual.innerHTML = '<div class="text-center">\
+												<br><br><br>\
+												<h2><b>A Unidade Responsável selecionada não possui nenhuma\
+												Unidade Consumidora registrada no sistema.</b></h2>\
+											</div>';
+				historicaMensal.innerHTML = '';
+
+			} else if(contas_5anos[unidCons]['data'].length === 0) { // Se a Unidade Consumidora não possuir nenhuma conta registrada
+				historicoAnual.innerHTML = '<div class="text-center">\
+												<br><br><br>\
+												<h2><b>A Unidade Consumidora não possui nenhuma Conta de energia elétrica\
+												registrada no sistema.</b></h2>\
+											</div>';
+				historicaMensal.innerHTML = '';
+
+			} else {
+				// Strings que decidirão entre consumo em kWh ou em R$
+				var ponta = '';
+				var foraPonta = '';
+				if(unidade == 'kWh') {
+					ponta = 'consumoPonta';
+					foraPonta = 'consumoForaPonta';
+				} else {
+					ponta = 'valorPonta';
+					foraPonta = 'valorForaPonta'
+				}
+
+
+				//////////////// 			GRÁFICO ANUAL 			///////////////////////
+				var anos = [];
+				var consumoTotal = []; // lista com o consumo total de cada ano
+				
+				// Construindo os arrays 'anos' e 'consumoTotal'
+				for(var i = 0; i < contas_5anos[unidCons]['data'].length; i++) {
+					// 'data.slice(0,4)' serve para pegar o ano da data que está escrita como 'YYYY-MM'
+					if(anos.includes(contas_5anos[unidCons]['data'][i].slice(0,4))) { // se o ano da referida conta já está no array 'anos'
+						// Somar o consumo ponta e fora ponta no consumo acumulado daquele ano
+						consumoTotal[anos.indexOf(contas_5anos[unidCons]['data'][i].slice(0,4))] +=
+							contas_5anos[unidCons][ponta][i] + contas_5anos[unidCons][foraPonta][i]					
+
+					} else { // se não
+						// adicionar novo ano no início do array 'anos' (no início por causa da ordem que plotly.js insere os dados no gráfico)
+						anos.unshift(contas_5anos[unidCons]['data'][i].slice(0,4)); 
+						// adicionar um novo campo com a soma (consumo ponta + consumo fora ponta) da Conta atual
+						consumoTotal.unshift(contas_5anos[unidCons][ponta][i] + contas_5anos[unidCons][foraPonta][i]); 
+					}
+				}
+				
+								
+				// dados do gráfico
+				var data = [{
+						 type: 'bar'
+					  	// ,x: 
+					  	,y: anos
+					  	,orientation: 'h' // deitado
+				}];
+
+				// layout do gráfico
+				var layout = {
+					title: 'Histórico anual do consumo de energia elétrica ['+unidCons+']'
+					,xaxis: {
+						 //title: 
+						//,tickformat:
+						fixedrange: true
+					}
+					,yaxis: {
+						 fixedrange: true
+						,type: 'category' // para evitar do plotly.js identificar os anos como números
+					}
+				};
+				
+				
+				// Caso a Unidade Consumidora possua registros de apenas um ano não haverá parametrização
+				if(anos.length === 1) {
+					data[0]['x'] = consumoTotal; // Eixo 'x' não parametrizado
+					
+					layout['xaxis']['title'] = 'Consumo ('+unidade+')';
+					
+				} else { // se não 
+					// consumo anual será parametrizado pelo ano anterior
+					var param = consumoTotal[1];
+					function parametrizacao(dado) {	return dado/param; }
+
+					data[0]['x'] = consumoTotal.map(parametrizacao); // Eixo 'x' parametrizado
+
+					layout['xaxis']['title'] = 'Consumo ('+unidade+') parametrizado pelo ano anterior';
+					layout['xaxis']['tickformat'] = ',.2%'; // Eixo 'x' em porcentagem									
+				}
+								
+				Plotly.newPlot('historicoAnualConsumo', data, layout);
+
+						
+
+				//////////////// 			GRÁFICO MENSAL 			///////////////////////
+				var consumoForaPonta = {
+					 x: contas_5anos[unidCons]['data']
+				  	,y: contas_5anos[unidCons][foraPonta]
+				  	,name: 'Fora de ponta'
+				  	,type: 'bar'
+				};
+				var consumoPonta = {
+				  	 x: contas_5anos[unidCons]['data']
+				  	,y: contas_5anos[unidCons][ponta]
+				  	,name: 'Ponta'
+				  	,type: 'bar'
+				};
+								
+				var layout = {
+				     title: 'Histórico mensal do consumo de energia elétrica ['+unidCons+']'
+				    //,xaxis: { title: 'Meses do ano'}
+					,yaxis: {
+						title: 'Consumo ('+unidade+')',
+						fixedrange: true
+					}
+					,barmode: 'stack'
+				};
+				
+				Plotly.newPlot('historicoMensalConsumo', [consumoForaPonta, consumoPonta], layout);
+
+
+				// Inserindo porcentagem abaixo do gráfico ao colocar o mouse sobre um dado
+				var hoverInfo = document.getElementById('hoverinfo');
+				historicaMensal.on('plotly_hover', function(data){
+				    var total = data.points[0].y + data.points[1].y;
+				    var infotext = '<div class="text-left"><h4>' +
+				    				data.points[1].data.name + ': ' + (data.points[1].y/total*100).toFixed(2) + '%' + '<br>'
+				    			  + data.points[0].data.name + ': ' + (data.points[0].y/total*100).toFixed(2) + '%' +
+				    			   	'</h4></div>';
+				    
+				    hoverInfo.innerHTML = infotext;
+				})
+				 .on('plotly_unhover', function(data){
+				    hoverInfo.innerHTML = '<h4><br><br></h4>';
+				});
+			}
+		}
 
 	</script>
 
 {% endblock %}
-
