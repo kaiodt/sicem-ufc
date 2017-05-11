@@ -93,9 +93,10 @@ class ConfigProducao(Config):
                 secure = ()
 
         # Gerar lista de emails dos desenvolvedores
-
-        lista_devs = Usuario.listar_desenvolvedores()
-        emails_desenvolvedores = [usuario.email for usuario in lista_devs]
+        emails_desenvolvedores = []
+        with app.app_context():
+            lista_devs = Usuario.listar_desenvolvedores()
+            emails_desenvolvedores = [usuario.email for usuario in lista_devs]
 
         # Criação do objeto que enviará os emails
 
