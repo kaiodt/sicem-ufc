@@ -93,17 +93,17 @@ class ConfigProducao(Config):
                 secure = ()
 
         # Gerar lista de emails dos desenvolvedores
-        emails_desenvolvedores = []
-        with app.app_context():
-            lista_devs = Usuario.listar_desenvolvedores()
-            emails_desenvolvedores = [usuario.email for usuario in lista_devs]
+        '''    Muitas tretas pra fazer isso rodar
+        lista_devs = Usuario.listar_desenvolvedores()
+        emails_desenvolvedores = [usuario.email for usuario in lista_devs]
+        '''
 
         # Criação do objeto que enviará os emails
 
         mail_handler = SMTPHandler(
             mailhost=(cls.MAIL_SERVER, cls.MAIL_PORT),
             fromaddr=cls.MAIL_SENDER,
-            toaddrs=emails_desenvolvedores,
+            toaddrs=ADMIN_EMAIL, # emails_desenvolvedores
             subject='Erro de Sistema - SICEM-UFC',
             credentials=credentials,
             secure=secure)
