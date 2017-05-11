@@ -80,7 +80,7 @@ class ConfigProducao(Config):
 
         import logging
         from logging.handlers import SMTPHandler
-        from app.models import Usuario
+        #from app.models import Usuario
 
         credentials = None
         secure = None
